@@ -2,17 +2,23 @@
 
 import * as core from '@actions/core'
 // context can be used in the user script
-import {context, GitHub} from '@actions/github'
+import {context as githubContext, GitHub} from '@actions/github'
 // fetch() can be used in the user script
-import fetch from 'node-fetch'
+import nodeFetch from 'node-fetch'
 // execSync() can be used in the user script
-import {execSync} from 'child_process'
+import {execSync as childProcessExecSync} from 'child_process'
 import * as marked from 'marked'
 
 const commentPrefix = '@github-actions run'
 
 async function run(): Promise<void> {
   try {
+    // Avoid mangling
+    const context = githubContext
+    // Avoid mangling
+    const fetch = nodeFetch
+    // Avoid mangling
+    const execSync = childProcessExecSync
     const githubToken = core.getInput('github-token', {required: true})
     if (context.eventName === 'issue_comment') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
