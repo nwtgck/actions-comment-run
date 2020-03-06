@@ -1,0 +1,9 @@
+name: 'Comment Run Actions'
+description: 'Run maintainer comments'
+author: 'Ryo Ota <nwtgck@nwtgck.org>'
+inputs:
+  github-token:
+    description: 'GitHub token'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

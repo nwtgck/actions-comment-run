@@ -1,0 +1,14 @@
+name: "operational-test"
+on:
+  # (from: https://help.github.com/en/actions/reference/events-that-trigger-workflows#issue-comment-event-issue_comment)
+  issue_comment:
+    types: [created]
+
+jobs:
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ./
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
