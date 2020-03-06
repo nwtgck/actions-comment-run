@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import * as core from '@actions/core'
-// context can be used in the user script
-import {context as githubContext, GitHub} from '@actions/github'
-// fetch() can be used in the user script
+import {
+  context as githubContext,
+  GitHub as actionsGitHub
+} from '@actions/github'
 import nodeFetch from 'node-fetch'
-// execSync() can be used in the user script
 import {execSync as childProcessExecSync} from 'child_process'
 import * as marked from 'marked'
 
@@ -15,6 +15,8 @@ async function run(): Promise<void> {
   try {
     // Avoid mangling
     const context = githubContext
+    // Avoid mangling
+    const GitHub = actionsGitHub
     // Avoid mangling
     const fetch = nodeFetch
     // Avoid mangling

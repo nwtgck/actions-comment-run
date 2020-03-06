@@ -3850,11 +3850,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
-// context can be used in the user script
 const github_1 = __webpack_require__(469);
-// fetch() can be used in the user script
 const node_fetch_1 = __importDefault(__webpack_require__(454));
-// execSync() can be used in the user script
 const child_process_1 = __webpack_require__(129);
 const marked = __importStar(__webpack_require__(886));
 const commentPrefix = '@github-actions run';
@@ -3863,6 +3860,8 @@ function run() {
         try {
             // Avoid mangling
             const context = github_1.context;
+            // Avoid mangling
+            const GitHub = github_1.GitHub;
             // Avoid mangling
             const fetch = node_fetch_1.default;
             // Avoid mangling
@@ -3886,7 +3885,7 @@ function run() {
                     return;
                 }
                 // Create GitHub client which can be used in the user script
-                const githubClient = new github_1.GitHub(githubToken);
+                const githubClient = new GitHub(githubToken);
                 // Parse the comment
                 const tokens = marked.lexer(comment);
                 for (const t of tokens) {
