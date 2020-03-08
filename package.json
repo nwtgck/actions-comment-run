@@ -27,6 +27,8 @@
   "dependencies": {
     "@actions/core": "^1.2.0",
     "@actions/github": "^2.1.1",
+    "fp-ts": "^2.5.3",
+    "io-ts": "^2.1.2",
     "marked": "^0.8.0",
     "node-fetch": "^2.6.0"
   },

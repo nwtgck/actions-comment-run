@@ -2019,6 +2019,27 @@ module.exports = require("os");
 
 /***/ }),
 
+/***/ 99:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * @since 2.0.0
+ */
+function tailRec(a, f) {
+    var v = f(a);
+    while (v._tag === 'Left') {
+        v = f(v.left);
+    }
+    return v.right;
+}
+exports.tailRec = tailRec;
+
+
+/***/ }),
+
 /***/ 106:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -3775,6 +3796,193 @@ function authenticationPlugin(octokit, options) {
 
 /***/ }),
 
+/***/ 194:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var function_1 = __webpack_require__(231);
+function pipe(a, ab, bc, cd, de, ef, fg, gh, hi, ij) {
+    switch (arguments.length) {
+        case 1:
+            return a;
+        case 2:
+            return ab(a);
+        case 3:
+            return bc(ab(a));
+        case 4:
+            return cd(bc(ab(a)));
+        case 5:
+            return de(cd(bc(ab(a))));
+        case 6:
+            return ef(de(cd(bc(ab(a)))));
+        case 7:
+            return fg(ef(de(cd(bc(ab(a))))));
+        case 8:
+            return gh(fg(ef(de(cd(bc(ab(a)))))));
+        case 9:
+            return hi(gh(fg(ef(de(cd(bc(ab(a))))))));
+        case 10:
+            return ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))));
+    }
+    return;
+}
+exports.pipe = pipe;
+var isFunctor = function (I) { return typeof I.map === 'function'; };
+var isContravariant = function (I) { return typeof I.contramap === 'function'; };
+var isFunctorWithIndex = function (I) { return typeof I.mapWithIndex === 'function'; };
+var isApply = function (I) { return typeof I.ap === 'function'; };
+var isChain = function (I) { return typeof I.chain === 'function'; };
+var isBifunctor = function (I) { return typeof I.bimap === 'function'; };
+var isExtend = function (I) { return typeof I.extend === 'function'; };
+var isFoldable = function (I) { return typeof I.reduce === 'function'; };
+var isFoldableWithIndex = function (I) { return typeof I.reduceWithIndex === 'function'; };
+var isAlt = function (I) { return typeof I.alt === 'function'; };
+var isCompactable = function (I) { return typeof I.compact === 'function'; };
+var isFilterable = function (I) { return typeof I.filter === 'function'; };
+var isFilterableWithIndex = function (I) {
+    return typeof I.filterWithIndex === 'function';
+};
+var isProfunctor = function (I) { return typeof I.promap === 'function'; };
+var isSemigroupoid = function (I) { return typeof I.compose === 'function'; };
+var isMonadThrow = function (I) { return typeof I.throwError === 'function'; };
+function pipeable(I) {
+    var r = {};
+    if (isFunctor(I)) {
+        var map = function (f) { return function (fa) { return I.map(fa, f); }; };
+        r.map = map;
+    }
+    if (isContravariant(I)) {
+        var contramap = function (f) { return function (fa) { return I.contramap(fa, f); }; };
+        r.contramap = contramap;
+    }
+    if (isFunctorWithIndex(I)) {
+        var mapWithIndex = function (f) { return function (fa) { return I.mapWithIndex(fa, f); }; };
+        r.mapWithIndex = mapWithIndex;
+    }
+    if (isApply(I)) {
+        var ap = function (fa) { return function (fab) { return I.ap(fab, fa); }; };
+        var apFirst = function (fb) { return function (fa) {
+            return I.ap(I.map(fa, function (a) { return function () { return a; }; }), fb);
+        }; };
+        r.ap = ap;
+        r.apFirst = apFirst;
+        r.apSecond = function (fb) { return function (fa) {
+            return I.ap(I.map(fa, function () { return function (b) { return b; }; }), fb);
+        }; };
+    }
+    if (isChain(I)) {
+        var chain = function (f) { return function (ma) { return I.chain(ma, f); }; };
+        var chainFirst = function (f) { return function (ma) { return I.chain(ma, function (a) { return I.map(f(a), function () { return a; }); }); }; };
+        var flatten = function (mma) { return I.chain(mma, function_1.identity); };
+        r.chain = chain;
+        r.chainFirst = chainFirst;
+        r.flatten = flatten;
+    }
+    if (isBifunctor(I)) {
+        var bimap = function (f, g) { return function (fa) { return I.bimap(fa, f, g); }; };
+        var mapLeft = function (f) { return function (fa) { return I.mapLeft(fa, f); }; };
+        r.bimap = bimap;
+        r.mapLeft = mapLeft;
+    }
+    if (isExtend(I)) {
+        var extend = function (f) { return function (wa) { return I.extend(wa, f); }; };
+        var duplicate = function (wa) { return I.extend(wa, function_1.identity); };
+        r.extend = extend;
+        r.duplicate = duplicate;
+    }
+    if (isFoldable(I)) {
+        var reduce = function (b, f) { return function (fa) { return I.reduce(fa, b, f); }; };
+        var foldMap = function (M) {
+            var foldMapM = I.foldMap(M);
+            return function (f) { return function (fa) { return foldMapM(fa, f); }; };
+        };
+        var reduceRight = function (b, f) { return function (fa) { return I.reduceRight(fa, b, f); }; };
+        r.reduce = reduce;
+        r.foldMap = foldMap;
+        r.reduceRight = reduceRight;
+    }
+    if (isFoldableWithIndex(I)) {
+        var reduceWithIndex = function (b, f) { return function (fa) {
+            return I.reduceWithIndex(fa, b, f);
+        }; };
+        var foldMapWithIndex = function (M) {
+            var foldMapM = I.foldMapWithIndex(M);
+            return function (f) { return function (fa) { return foldMapM(fa, f); }; };
+        };
+        var reduceRightWithIndex = function (b, f) { return function (fa) {
+            return I.reduceRightWithIndex(fa, b, f);
+        }; };
+        r.reduceWithIndex = reduceWithIndex;
+        r.foldMapWithIndex = foldMapWithIndex;
+        r.reduceRightWithIndex = reduceRightWithIndex;
+    }
+    if (isAlt(I)) {
+        var alt = function (that) { return function (fa) { return I.alt(fa, that); }; };
+        r.alt = alt;
+    }
+    if (isCompactable(I)) {
+        r.compact = I.compact;
+        r.separate = I.separate;
+    }
+    if (isFilterable(I)) {
+        var filter = function (predicate) { return function (fa) {
+            return I.filter(fa, predicate);
+        }; };
+        var filterMap = function (f) { return function (fa) { return I.filterMap(fa, f); }; };
+        var partition = function (predicate) { return function (fa) {
+            return I.partition(fa, predicate);
+        }; };
+        var partitionMap = function (f) { return function (fa) { return I.partitionMap(fa, f); }; };
+        r.filter = filter;
+        r.filterMap = filterMap;
+        r.partition = partition;
+        r.partitionMap = partitionMap;
+    }
+    if (isFilterableWithIndex(I)) {
+        var filterWithIndex = function (predicateWithIndex) { return function (fa) { return I.filterWithIndex(fa, predicateWithIndex); }; };
+        var filterMapWithIndex = function (f) { return function (fa) {
+            return I.filterMapWithIndex(fa, f);
+        }; };
+        var partitionWithIndex = function (predicateWithIndex) { return function (fa) { return I.partitionWithIndex(fa, predicateWithIndex); }; };
+        var partitionMapWithIndex = function (f) { return function (fa) {
+            return I.partitionMapWithIndex(fa, f);
+        }; };
+        r.filterWithIndex = filterWithIndex;
+        r.filterMapWithIndex = filterMapWithIndex;
+        r.partitionWithIndex = partitionWithIndex;
+        r.partitionMapWithIndex = partitionMapWithIndex;
+    }
+    if (isProfunctor(I)) {
+        var promap = function (f, g) { return function (fa) { return I.promap(fa, f, g); }; };
+        r.promap = promap;
+    }
+    if (isSemigroupoid(I)) {
+        var compose = function (that) { return function (fa) { return I.compose(fa, that); }; };
+        r.compose = compose;
+    }
+    if (isMonadThrow(I)) {
+        var fromOption = function (onNone) { return function (ma) {
+            return ma._tag === 'None' ? I.throwError(onNone()) : I.of(ma.value);
+        }; };
+        var fromEither = function (ma) {
+            return ma._tag === 'Left' ? I.throwError(ma.left) : I.of(ma.right);
+        };
+        var fromPredicate = function (predicate, onFalse) { return function (a) { return (predicate(a) ? I.of(a) : I.throwError(onFalse(a))); }; };
+        var filterOrElse = function (predicate, onFalse) { return function (ma) { return I.chain(ma, function (a) { return (predicate(a) ? I.of(a) : I.throwError(onFalse(a))); }); }; };
+        r.fromOption = fromOption;
+        r.fromEither = fromEither;
+        r.fromPredicate = fromPredicate;
+        r.filterOrElse = filterOrElse;
+    }
+    return r;
+}
+exports.pipeable = pipeable;
+
+
+/***/ }),
+
 /***/ 197:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -3854,6 +4062,9 @@ const github_1 = __webpack_require__(469);
 const node_fetch_1 = __importDefault(__webpack_require__(454));
 const child_process_1 = __webpack_require__(129);
 const marked = __importStar(__webpack_require__(886));
+const t = __importStar(__webpack_require__(338));
+const Either_1 = __webpack_require__(311);
+const commentAuthorAssociationsType = t.array(t.string);
 const commentPrefix = '@github-actions run';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -3876,24 +4087,34 @@ function run() {
                     console.log(`HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`);
                     return;
                 }
+                // Get allowed associations
+                const allowedAssociationsStr = core.getInput('allowed-associations');
+                // Parse and validate
+                const allowedAssociationsEither = commentAuthorAssociationsType.decode(JSON.parse(allowedAssociationsStr));
+                if (!Either_1.isRight(allowedAssociationsEither)) {
+                    // eslint-disable-next-line no-console
+                    console.error(`ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`);
+                    return;
+                }
+                const allowedAssociations = allowedAssociationsEither.right;
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const association = context.payload.comment.author_association;
-                // If commenting user has no write permission
-                if (!(association === 'OWNER' || association === 'COLLABORATOR')) {
+                // If commenting user is not allowed to run scripts
+                if (!allowedAssociations.includes(association)) {
                     // eslint-disable-next-line no-console
-                    console.warn(`NOTE: The owner and the collaborators can trigger this action, but you are ${association}.`);
+                    console.warn(`NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`);
                     return;
                 }
                 // Create GitHub client which can be used in the user script
                 const githubClient = new GitHub(githubToken);
                 // Parse the comment
                 const tokens = marked.lexer(comment);
-                for (const t of tokens) {
-                    if (t.type === 'code') {
-                        if (t.lang === 'js' || t.lang === 'javascript') {
+                for (const token of tokens) {
+                    if (token.type === 'code') {
+                        if (token.lang === 'js' || token.lang === 'javascript') {
                             // Eval JavaScript
                             // NOTE: Eval result can be promise
-                            yield eval(t.text);
+                            yield eval(token.text);
                         }
                     }
                 }
@@ -3992,6 +4213,196 @@ exports.getUserAgent = getUserAgent;
 /***/ (function(module) {
 
 module.exports = {"name":"@octokit/rest","version":"16.43.1","publishConfig":{"access":"public"},"description":"GitHub REST API client for Node.js","keywords":["octokit","github","rest","api-client"],"author":"Gregor Martynus (https://github.com/gr2m)","contributors":[{"name":"Mike de Boer","email":"info@mikedeboer.nl"},{"name":"Fabian Jakobs","email":"fabian@c9.io"},{"name":"Joe Gallo","email":"joe@brassafrax.com"},{"name":"Gregor Martynus","url":"https://github.com/gr2m"}],"repository":"https://github.com/octokit/rest.js","dependencies":{"@octokit/auth-token":"^2.4.0","@octokit/plugin-paginate-rest":"^1.1.1","@octokit/plugin-request-log":"^1.0.0","@octokit/plugin-rest-endpoint-methods":"2.4.0","@octokit/request":"^5.2.0","@octokit/request-error":"^1.0.2","atob-lite":"^2.0.0","before-after-hook":"^2.0.0","btoa-lite":"^1.0.0","deprecation":"^2.0.0","lodash.get":"^4.4.2","lodash.set":"^4.3.2","lodash.uniq":"^4.5.0","octokit-pagination-methods":"^1.1.0","once":"^1.4.0","universal-user-agent":"^4.0.0"},"devDependencies":{"@gimenete/type-writer":"^0.1.3","@octokit/auth":"^1.1.1","@octokit/fixtures-server":"^5.0.6","@octokit/graphql":"^4.2.0","@types/node":"^13.1.0","bundlesize":"^0.18.0","chai":"^4.1.2","compression-webpack-plugin":"^3.1.0","cypress":"^3.0.0","glob":"^7.1.2","http-proxy-agent":"^4.0.0","lodash.camelcase":"^4.3.0","lodash.merge":"^4.6.1","lodash.upperfirst":"^4.3.1","lolex":"^5.1.2","mkdirp":"^1.0.0","mocha":"^7.0.1","mustache":"^4.0.0","nock":"^11.3.3","npm-run-all":"^4.1.2","nyc":"^15.0.0","prettier":"^1.14.2","proxy":"^1.0.0","semantic-release":"^17.0.0","sinon":"^8.0.0","sinon-chai":"^3.0.0","sort-keys":"^4.0.0","string-to-arraybuffer":"^1.0.0","string-to-jsdoc-comment":"^1.0.0","typescript":"^3.3.1","webpack":"^4.0.0","webpack-bundle-analyzer":"^3.0.0","webpack-cli":"^3.0.0"},"types":"index.d.ts","scripts":{"coverage":"nyc report --reporter=html && open coverage/index.html","lint":"prettier --check '{lib,plugins,scripts,test}/**/*.{js,json,ts}' 'docs/*.{js,json}' 'docs/src/**/*' index.js README.md package.json","lint:fix":"prettier --write '{lib,plugins,scripts,test}/**/*.{js,json,ts}' 'docs/*.{js,json}' 'docs/src/**/*' index.js README.md package.json","pretest":"npm run -s lint","test":"nyc mocha test/mocha-node-setup.js \"test/*/**/*-test.js\"","test:browser":"cypress run --browser chrome","build":"npm-run-all build:*","build:ts":"npm run -s update-endpoints:typescript","prebuild:browser":"mkdirp dist/","build:browser":"npm-run-all build:browser:*","build:browser:development":"webpack --mode development --entry . --output-library=Octokit --output=./dist/octokit-rest.js --profile --json > dist/bundle-stats.json","build:browser:production":"webpack --mode production --entry . --plugin=compression-webpack-plugin --output-library=Octokit --output-path=./dist --output-filename=octokit-rest.min.js --devtool source-map","generate-bundle-report":"webpack-bundle-analyzer dist/bundle-stats.json --mode=static --no-open --report dist/bundle-report.html","update-endpoints":"npm-run-all update-endpoints:*","update-endpoints:fetch-json":"node scripts/update-endpoints/fetch-json","update-endpoints:typescript":"node scripts/update-endpoints/typescript","prevalidate:ts":"npm run -s build:ts","validate:ts":"tsc --target es6 --noImplicitAny index.d.ts","postvalidate:ts":"tsc --noEmit --target es6 test/typescript-validate.ts","start-fixtures-server":"octokit-fixtures-server"},"license":"MIT","files":["index.js","index.d.ts","lib","plugins"],"nyc":{"ignore":["test"]},"release":{"publish":["@semantic-release/npm",{"path":"@semantic-release/github","assets":["dist/*","!dist/*.map.gz"]}]},"bundlesize":[{"path":"./dist/octokit-rest.min.js.gz","maxSize":"33 kB"}],"_resolved":"https://registry.npmjs.org/@octokit/rest/-/rest-16.43.1.tgz","_integrity":"sha512-gfFKwRT/wFxq5qlNjnW2dh+qh74XgTQ2B179UX5K1HYCluioWj8Ndbgqw2PVqa1NnVJkGHp2ovMpVn/DImlmkw==","_from":"@octokit/rest@16.43.1"};
+
+/***/ }),
+
+/***/ 231:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+/**
+ * @since 2.0.0
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * @since 2.0.0
+ */
+function identity(a) {
+    return a;
+}
+exports.identity = identity;
+/**
+ * @since 2.0.0
+ */
+exports.unsafeCoerce = identity;
+/**
+ * @since 2.0.0
+ */
+function not(predicate) {
+    return function (a) { return !predicate(a); };
+}
+exports.not = not;
+/**
+ * @since 2.0.0
+ */
+function constant(a) {
+    return function () { return a; };
+}
+exports.constant = constant;
+/**
+ * A thunk that returns always `true`
+ *
+ * @since 2.0.0
+ */
+exports.constTrue = function () {
+    return true;
+};
+/**
+ * A thunk that returns always `false`
+ *
+ * @since 2.0.0
+ */
+exports.constFalse = function () {
+    return false;
+};
+/**
+ * A thunk that returns always `null`
+ *
+ * @since 2.0.0
+ */
+exports.constNull = function () {
+    return null;
+};
+/**
+ * A thunk that returns always `undefined`
+ *
+ * @since 2.0.0
+ */
+exports.constUndefined = function () {
+    return;
+};
+/**
+ * A thunk that returns always `void`
+ *
+ * @since 2.0.0
+ */
+exports.constVoid = function () {
+    return;
+};
+/**
+ * Flips the order of the arguments of a function of two arguments.
+ *
+ * @since 2.0.0
+ */
+function flip(f) {
+    return function (b, a) { return f(a, b); };
+}
+exports.flip = flip;
+function flow(ab, bc, cd, de, ef, fg, gh, hi, ij) {
+    switch (arguments.length) {
+        case 1:
+            return ab;
+        case 2:
+            return function () {
+                return bc(ab.apply(this, arguments));
+            };
+        case 3:
+            return function () {
+                return cd(bc(ab.apply(this, arguments)));
+            };
+        case 4:
+            return function () {
+                return de(cd(bc(ab.apply(this, arguments))));
+            };
+        case 5:
+            return function () {
+                return ef(de(cd(bc(ab.apply(this, arguments)))));
+            };
+        case 6:
+            return function () {
+                return fg(ef(de(cd(bc(ab.apply(this, arguments))))));
+            };
+        case 7:
+            return function () {
+                return gh(fg(ef(de(cd(bc(ab.apply(this, arguments)))))));
+            };
+        case 8:
+            return function () {
+                return hi(gh(fg(ef(de(cd(bc(ab.apply(this, arguments))))))));
+            };
+        case 9:
+            return function () {
+                return ij(hi(gh(fg(ef(de(cd(bc(ab.apply(this, arguments)))))))));
+            };
+    }
+    return;
+}
+exports.flow = flow;
+/**
+ * @since 2.0.0
+ */
+function tuple() {
+    var t = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        t[_i] = arguments[_i];
+    }
+    return t;
+}
+exports.tuple = tuple;
+/**
+ * @since 2.0.0
+ */
+function increment(n) {
+    return n + 1;
+}
+exports.increment = increment;
+/**
+ * @since 2.0.0
+ */
+function decrement(n) {
+    return n - 1;
+}
+exports.decrement = decrement;
+/**
+ * @since 2.0.0
+ */
+function absurd(_) {
+    throw new Error('Called `absurd` function which should be uncallable');
+}
+exports.absurd = absurd;
+/**
+ * Creates a tupled version of this function: instead of `n` arguments, it accepts a single tuple argument.
+ *
+ * @example
+ * import { tupled } from 'fp-ts/lib/function'
+ *
+ * const add = tupled((x: number, y: number): number => x + y)
+ *
+ * assert.strictEqual(add([1, 2]), 3)
+ *
+ * @since 2.4.0
+ */
+function tupled(f) {
+    return function (a) { return f.apply(void 0, a); };
+}
+exports.tupled = tupled;
+/**
+ * Inverse function of `tupled`
+ *
+ * @since 2.4.0
+ */
+function untupled(f) {
+    return function () {
+        var a = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            a[_i] = arguments[_i];
+        }
+        return f(a);
+    };
+}
+exports.untupled = untupled;
+
 
 /***/ }),
 
@@ -5284,6 +5695,527 @@ exports.paginateRest = paginateRest;
 
 /***/ }),
 
+/***/ 311:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * Represents a value of one of two possible types (a disjoint union).
+ *
+ * An instance of `Either` is either an instance of `Left` or `Right`.
+ *
+ * A common use of `Either` is as an alternative to `Option` for dealing with possible missing values. In this usage,
+ * `None` is replaced with a `Left` which can contain useful information. `Right` takes the place of `Some`. Convention
+ * dictates that `Left` is used for failure and `Right` is used for success.
+ *
+ * For example, you could use `Either<string, number>` to detect whether a received input is a `string` or a `number`.
+ *
+ * ```ts
+ * import { Either, left, right } from 'fp-ts/lib/Either'
+ *
+ * function parse(input: string): Either<Error, number> {
+ *   const n = parseInt(input, 10)
+ *   return isNaN(n) ? left(new Error('not a number')) : right(n)
+ * }
+ * ```
+ *
+ * `Either` is right-biased, which means that `Right` is assumed to be the default case to operate on. If it is `Left`,
+ * operations like `map`, `chain`, ... return the `Left` value unchanged:
+ *
+ * ```ts
+ * import { map, left, right } from 'fp-ts/lib/Either'
+ * import { pipe } from 'fp-ts/lib/pipeable'
+ *
+ * pipe(right(12), map(double)) // right(24)
+ * pipe(left(23), map(double))  // left(23)
+ * ```
+ *
+ * @since 2.0.0
+ */
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var ChainRec_1 = __webpack_require__(99);
+var pipeable_1 = __webpack_require__(194);
+/**
+ * @since 2.0.0
+ */
+exports.URI = 'Either';
+/**
+ * Constructs a new `Either` holding a `Left` value. This usually represents a failure, due to the right-bias of this
+ * structure
+ *
+ * @since 2.0.0
+ */
+function left(e) {
+    return { _tag: 'Left', left: e };
+}
+exports.left = left;
+/**
+ * Constructs a new `Either` holding a `Right` value. This usually represents a successful value due to the right bias
+ * of this structure
+ *
+ * @since 2.0.0
+ */
+function right(a) {
+    return { _tag: 'Right', right: a };
+}
+exports.right = right;
+/**
+ * Takes a default and a nullable value, if the value is not nully, turn it into a `Right`, if the value is nully use
+ * the provided default as a `Left`
+ *
+ * @example
+ * import { fromNullable, left, right } from 'fp-ts/lib/Either'
+ *
+ * const parse = fromNullable('nully')
+ *
+ * assert.deepStrictEqual(parse(1), right(1))
+ * assert.deepStrictEqual(parse(null), left('nully'))
+ *
+ * @since 2.0.0
+ */
+function fromNullable(e) {
+    return function (a) { return (a == null ? left(e) : right(a)); };
+}
+exports.fromNullable = fromNullable;
+/**
+ * Default value for the `onError` argument of `tryCatch`
+ *
+ * @since 2.0.0
+ */
+function toError(e) {
+    return e instanceof Error ? e : new Error(String(e));
+}
+exports.toError = toError;
+/**
+ * Constructs a new `Either` from a function that might throw
+ *
+ * @example
+ * import { Either, left, right, tryCatch } from 'fp-ts/lib/Either'
+ *
+ * const unsafeHead = <A>(as: Array<A>): A => {
+ *   if (as.length > 0) {
+ *     return as[0]
+ *   } else {
+ *     throw new Error('empty array')
+ *   }
+ * }
+ *
+ * const head = <A>(as: Array<A>): Either<Error, A> => {
+ *   return tryCatch(() => unsafeHead(as), e => (e instanceof Error ? e : new Error('unknown error')))
+ * }
+ *
+ * assert.deepStrictEqual(head([]), left(new Error('empty array')))
+ * assert.deepStrictEqual(head([1, 2, 3]), right(1))
+ *
+ * @since 2.0.0
+ */
+function tryCatch(f, onError) {
+    try {
+        return right(f());
+    }
+    catch (e) {
+        return left(onError(e));
+    }
+}
+exports.tryCatch = tryCatch;
+/**
+ * Takes two functions and an `Either` value, if the value is a `Left` the inner value is applied to the first function,
+ * if the value is a `Right` the inner value is applied to the second function.
+ *
+ * @example
+ * import { fold, left, right } from 'fp-ts/lib/Either'
+ * import { pipe } from 'fp-ts/lib/pipeable'
+ *
+ * function onLeft(errors: Array<string>): string {
+ *   return `Errors: ${errors.join(', ')}`
+ * }
+ *
+ * function onRight(value: number): string {
+ *   return `Ok: ${value}`
+ * }
+ *
+ * assert.strictEqual(
+ *   pipe(
+ *     right(1),
+ *     fold(onLeft, onRight)
+ *   ),
+ *   'Ok: 1'
+ * )
+ * assert.strictEqual(
+ *   pipe(
+ *     left(['error 1', 'error 2']),
+ *     fold(onLeft, onRight)
+ *   ),
+ *   'Errors: error 1, error 2'
+ * )
+ *
+ * @since 2.0.0
+ */
+function fold(onLeft, onRight) {
+    return function (ma) { return (isLeft(ma) ? onLeft(ma.left) : onRight(ma.right)); };
+}
+exports.fold = fold;
+/**
+ * @since 2.0.0
+ */
+function getShow(SE, SA) {
+    return {
+        show: function (ma) { return (isLeft(ma) ? "left(" + SE.show(ma.left) + ")" : "right(" + SA.show(ma.right) + ")"); }
+    };
+}
+exports.getShow = getShow;
+/**
+ * @since 2.0.0
+ */
+function getEq(EL, EA) {
+    return {
+        equals: function (x, y) {
+            return x === y || (isLeft(x) ? isLeft(y) && EL.equals(x.left, y.left) : isRight(y) && EA.equals(x.right, y.right));
+        }
+    };
+}
+exports.getEq = getEq;
+/**
+ * Semigroup returning the left-most non-`Left` value. If both operands are `Right`s then the inner values are
+ * appended using the provided `Semigroup`
+ *
+ * @example
+ * import { getSemigroup, left, right } from 'fp-ts/lib/Either'
+ * import { semigroupSum } from 'fp-ts/lib/Semigroup'
+ *
+ * const S = getSemigroup<string, number>(semigroupSum)
+ * assert.deepStrictEqual(S.concat(left('a'), left('b')), left('a'))
+ * assert.deepStrictEqual(S.concat(left('a'), right(2)), right(2))
+ * assert.deepStrictEqual(S.concat(right(1), left('b')), right(1))
+ * assert.deepStrictEqual(S.concat(right(1), right(2)), right(3))
+ *
+ *
+ * @since 2.0.0
+ */
+function getSemigroup(S) {
+    return {
+        concat: function (x, y) { return (isLeft(y) ? x : isLeft(x) ? y : right(S.concat(x.right, y.right))); }
+    };
+}
+exports.getSemigroup = getSemigroup;
+/**
+ * `Apply` semigroup
+ *
+ * @example
+ * import { getApplySemigroup, left, right } from 'fp-ts/lib/Either'
+ * import { semigroupSum } from 'fp-ts/lib/Semigroup'
+ *
+ * const S = getApplySemigroup<string, number>(semigroupSum)
+ * assert.deepStrictEqual(S.concat(left('a'), left('b')), left('a'))
+ * assert.deepStrictEqual(S.concat(left('a'), right(2)), left('a'))
+ * assert.deepStrictEqual(S.concat(right(1), left('b')), left('b'))
+ * assert.deepStrictEqual(S.concat(right(1), right(2)), right(3))
+ *
+ *
+ * @since 2.0.0
+ */
+function getApplySemigroup(S) {
+    return {
+        concat: function (x, y) { return (isLeft(x) ? x : isLeft(y) ? y : right(S.concat(x.right, y.right))); }
+    };
+}
+exports.getApplySemigroup = getApplySemigroup;
+/**
+ * @since 2.0.0
+ */
+function getApplyMonoid(M) {
+    return __assign(__assign({}, getApplySemigroup(M)), { empty: right(M.empty) });
+}
+exports.getApplyMonoid = getApplyMonoid;
+/**
+ * Returns `true` if the either is an instance of `Left`, `false` otherwise
+ *
+ * @since 2.0.0
+ */
+function isLeft(ma) {
+    switch (ma._tag) {
+        case 'Left':
+            return true;
+        case 'Right':
+            return false;
+    }
+}
+exports.isLeft = isLeft;
+/**
+ * Returns `true` if the either is an instance of `Right`, `false` otherwise
+ *
+ * @since 2.0.0
+ */
+function isRight(ma) {
+    return isLeft(ma) ? false : true;
+}
+exports.isRight = isRight;
+/**
+ * @since 2.0.0
+ */
+function swap(ma) {
+    return isLeft(ma) ? right(ma.left) : left(ma.right);
+}
+exports.swap = swap;
+/**
+ * @since 2.0.0
+ */
+function orElse(onLeft) {
+    return function (ma) { return (isLeft(ma) ? onLeft(ma.left) : ma); };
+}
+exports.orElse = orElse;
+/**
+ * @since 2.0.0
+ */
+function getOrElse(onLeft) {
+    return function (ma) { return (isLeft(ma) ? onLeft(ma.left) : ma.right); };
+}
+exports.getOrElse = getOrElse;
+/**
+ * @since 2.0.0
+ */
+function elem(E) {
+    return function (a, ma) { return (isLeft(ma) ? false : E.equals(a, ma.right)); };
+}
+exports.elem = elem;
+/**
+ * Returns `false` if `Left` or returns the result of the application of the given predicate to the `Right` value.
+ *
+ * @example
+ * import { exists, left, right } from 'fp-ts/lib/Either'
+ *
+ * const gt2 = exists((n: number) => n > 2)
+ *
+ * assert.strictEqual(gt2(left('a')), false)
+ * assert.strictEqual(gt2(right(1)), false)
+ * assert.strictEqual(gt2(right(3)), true)
+ *
+ * @since 2.0.0
+ */
+function exists(predicate) {
+    return function (ma) { return (isLeft(ma) ? false : predicate(ma.right)); };
+}
+exports.exists = exists;
+/**
+ * Converts a JavaScript Object Notation (JSON) string into an object.
+ *
+ * @example
+ * import { parseJSON, toError, right, left } from 'fp-ts/lib/Either'
+ *
+ * assert.deepStrictEqual(parseJSON('{"a":1}', toError), right({ a: 1 }))
+ * assert.deepStrictEqual(parseJSON('{"a":}', toError), left(new SyntaxError('Unexpected token } in JSON at position 5')))
+ *
+ * @since 2.0.0
+ */
+function parseJSON(s, onError) {
+    return tryCatch(function () { return JSON.parse(s); }, onError);
+}
+exports.parseJSON = parseJSON;
+/**
+ * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
+ *
+ * @example
+ * import * as E from 'fp-ts/lib/Either'
+ * import { pipe } from 'fp-ts/lib/pipeable'
+ *
+ * assert.deepStrictEqual(E.stringifyJSON({ a: 1 }, E.toError), E.right('{"a":1}'))
+ * const circular: any = { ref: null }
+ * circular.ref = circular
+ * assert.deepStrictEqual(
+ *   pipe(
+ *     E.stringifyJSON(circular, E.toError),
+ *     E.mapLeft(e => e.message.includes('Converting circular structure to JSON'))
+ *   ),
+ *   E.left(true)
+ * )
+ *
+ * @since 2.0.0
+ */
+function stringifyJSON(u, onError) {
+    return tryCatch(function () { return JSON.stringify(u); }, onError);
+}
+exports.stringifyJSON = stringifyJSON;
+/**
+ * Builds `Witherable` instance for `Either` given `Monoid` for the left side
+ *
+ * @since 2.0.0
+ */
+function getWitherable(M) {
+    var empty = left(M.empty);
+    var compact = function (ma) {
+        return isLeft(ma) ? ma : ma.right._tag === 'None' ? left(M.empty) : right(ma.right.value);
+    };
+    var separate = function (ma) {
+        return isLeft(ma)
+            ? { left: ma, right: ma }
+            : isLeft(ma.right)
+                ? { left: right(ma.right.left), right: empty }
+                : { left: empty, right: right(ma.right.right) };
+    };
+    var partitionMap = function (ma, f) {
+        if (isLeft(ma)) {
+            return { left: ma, right: ma };
+        }
+        var e = f(ma.right);
+        return isLeft(e) ? { left: right(e.left), right: empty } : { left: empty, right: right(e.right) };
+    };
+    var partition = function (ma, p) {
+        return isLeft(ma)
+            ? { left: ma, right: ma }
+            : p(ma.right)
+                ? { left: empty, right: right(ma.right) }
+                : { left: right(ma.right), right: empty };
+    };
+    var filterMap = function (ma, f) {
+        if (isLeft(ma)) {
+            return ma;
+        }
+        var ob = f(ma.right);
+        return ob._tag === 'None' ? left(M.empty) : right(ob.value);
+    };
+    var filter = function (ma, predicate) {
+        return isLeft(ma) ? ma : predicate(ma.right) ? ma : left(M.empty);
+    };
+    var wither = function (F) {
+        var traverseF = exports.either.traverse(F);
+        return function (ma, f) { return F.map(traverseF(ma, f), compact); };
+    };
+    var wilt = function (F) {
+        var traverseF = exports.either.traverse(F);
+        return function (ma, f) { return F.map(traverseF(ma, f), separate); };
+    };
+    return {
+        URI: exports.URI,
+        _E: undefined,
+        map: exports.either.map,
+        compact: compact,
+        separate: separate,
+        filter: filter,
+        filterMap: filterMap,
+        partition: partition,
+        partitionMap: partitionMap,
+        traverse: exports.either.traverse,
+        sequence: exports.either.sequence,
+        reduce: exports.either.reduce,
+        foldMap: exports.either.foldMap,
+        reduceRight: exports.either.reduceRight,
+        wither: wither,
+        wilt: wilt
+    };
+}
+exports.getWitherable = getWitherable;
+/**
+ * @since 2.0.0
+ */
+function getValidation(S) {
+    return __assign(__assign({}, exports.either), { _E: undefined, ap: function (mab, ma) {
+            return isLeft(mab)
+                ? isLeft(ma)
+                    ? left(S.concat(mab.left, ma.left))
+                    : mab
+                : isLeft(ma)
+                    ? ma
+                    : right(mab.right(ma.right));
+        }, alt: function (fx, f) {
+            if (isRight(fx)) {
+                return fx;
+            }
+            var fy = f();
+            return isLeft(fy) ? left(S.concat(fx.left, fy.left)) : fy;
+        } });
+}
+exports.getValidation = getValidation;
+/**
+ * @since 2.0.0
+ */
+function getValidationSemigroup(SE, SA) {
+    return {
+        concat: function (fx, fy) {
+            return isLeft(fx)
+                ? isLeft(fy)
+                    ? left(SE.concat(fx.left, fy.left))
+                    : fx
+                : isLeft(fy)
+                    ? fy
+                    : right(SA.concat(fx.right, fy.right));
+        }
+    };
+}
+exports.getValidationSemigroup = getValidationSemigroup;
+/**
+ * @since 2.0.0
+ */
+function getValidationMonoid(SE, SA) {
+    return {
+        concat: getValidationSemigroup(SE, SA).concat,
+        empty: right(SA.empty)
+    };
+}
+exports.getValidationMonoid = getValidationMonoid;
+/**
+ * @since 2.0.0
+ */
+exports.either = {
+    URI: exports.URI,
+    map: function (ma, f) { return (isLeft(ma) ? ma : right(f(ma.right))); },
+    of: right,
+    ap: function (mab, ma) { return (isLeft(mab) ? mab : isLeft(ma) ? ma : right(mab.right(ma.right))); },
+    chain: function (ma, f) { return (isLeft(ma) ? ma : f(ma.right)); },
+    reduce: function (fa, b, f) { return (isLeft(fa) ? b : f(b, fa.right)); },
+    foldMap: function (M) { return function (fa, f) { return (isLeft(fa) ? M.empty : f(fa.right)); }; },
+    reduceRight: function (fa, b, f) { return (isLeft(fa) ? b : f(fa.right, b)); },
+    traverse: function (F) { return function (ma, f) {
+        return isLeft(ma) ? F.of(left(ma.left)) : F.map(f(ma.right), right);
+    }; },
+    sequence: function (F) { return function (ma) {
+        return isLeft(ma) ? F.of(left(ma.left)) : F.map(ma.right, right);
+    }; },
+    bimap: function (fea, f, g) { return (isLeft(fea) ? left(f(fea.left)) : right(g(fea.right))); },
+    mapLeft: function (fea, f) { return (isLeft(fea) ? left(f(fea.left)) : fea); },
+    alt: function (fx, fy) { return (isLeft(fx) ? fy() : fx); },
+    extend: function (wa, f) { return (isLeft(wa) ? wa : right(f(wa))); },
+    chainRec: function (a, f) {
+        return ChainRec_1.tailRec(f(a), function (e) {
+            return isLeft(e) ? right(left(e.left)) : isLeft(e.right) ? left(f(e.right.left)) : right(right(e.right.right));
+        });
+    },
+    throwError: left
+};
+var _a = pipeable_1.pipeable(exports.either), alt = _a.alt, ap = _a.ap, apFirst = _a.apFirst, apSecond = _a.apSecond, bimap = _a.bimap, chain = _a.chain, chainFirst = _a.chainFirst, duplicate = _a.duplicate, extend = _a.extend, flatten = _a.flatten, foldMap = _a.foldMap, map = _a.map, mapLeft = _a.mapLeft, reduce = _a.reduce, reduceRight = _a.reduceRight, fromOption = _a.fromOption, fromPredicate = _a.fromPredicate, filterOrElse = _a.filterOrElse;
+exports.alt = alt;
+exports.ap = ap;
+exports.apFirst = apFirst;
+exports.apSecond = apSecond;
+exports.bimap = bimap;
+exports.chain = chain;
+exports.chainFirst = chainFirst;
+exports.duplicate = duplicate;
+exports.extend = extend;
+exports.flatten = flatten;
+exports.foldMap = foldMap;
+exports.map = map;
+exports.mapLeft = mapLeft;
+exports.reduce = reduce;
+exports.reduceRight = reduceRight;
+exports.fromOption = fromOption;
+exports.fromPredicate = fromPredicate;
+exports.filterOrElse = filterOrElse;
+
+
+/***/ }),
+
 /***/ 323:
 /***/ (function(module) {
 
@@ -5325,6 +6257,1495 @@ function hasLastPage (link) {
   deprecate(`octokit.hasLastPage() – You can use octokit.paginate or async iterators instead: https://github.com/octokit/rest.js#pagination.`)
   return getPageLinks(link).last
 }
+
+
+/***/ }),
+
+/***/ 338:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * @since 1.0.0
+ */
+var Either_1 = __webpack_require__(311);
+var map = Either_1.either.map;
+var chain = Either_1.either.chain;
+/**
+ * @since 1.0.0
+ */
+var Type = /** @class */ (function () {
+    function Type(
+    /** a unique name for this codec */
+    name, 
+    /** a custom type guard */
+    is, 
+    /** succeeds if a value of type I can be decoded to a value of type A */
+    validate, 
+    /** converts a value of type A to a value of type O */
+    encode) {
+        this.name = name;
+        this.is = is;
+        this.validate = validate;
+        this.encode = encode;
+        this.decode = this.decode.bind(this);
+    }
+    /**
+     * @since 1.0.0
+     */
+    Type.prototype.pipe = function (ab, name) {
+        var _this = this;
+        if (name === void 0) { name = "pipe(" + this.name + ", " + ab.name + ")"; }
+        return new Type(name, ab.is, function (i, c) { return chain(_this.validate(i, c), function (a) { return ab.validate(a, c); }); }, this.encode === exports.identity && ab.encode === exports.identity ? exports.identity : function (b) { return _this.encode(ab.encode(b)); });
+    };
+    /**
+     * @since 1.0.0
+     */
+    Type.prototype.asDecoder = function () {
+        return this;
+    };
+    /**
+     * @since 1.0.0
+     */
+    Type.prototype.asEncoder = function () {
+        return this;
+    };
+    /**
+     * a version of `validate` with a default context
+     * @since 1.0.0
+     */
+    Type.prototype.decode = function (i) {
+        return this.validate(i, [{ key: '', type: this, actual: i }]);
+    };
+    return Type;
+}());
+exports.Type = Type;
+/**
+ * @since 1.0.0
+ */
+exports.identity = function (a) { return a; };
+/**
+ * @since 1.0.0
+ */
+exports.getFunctionName = function (f) {
+    return f.displayName || f.name || "<function" + f.length + ">";
+};
+/**
+ * @since 1.0.0
+ */
+exports.getContextEntry = function (key, decoder) { return ({ key: key, type: decoder }); };
+/**
+ * @since 1.0.0
+ */
+exports.appendContext = function (c, key, decoder, actual) {
+    var len = c.length;
+    var r = Array(len + 1);
+    for (var i = 0; i < len; i++) {
+        r[i] = c[i];
+    }
+    r[len] = { key: key, type: decoder, actual: actual };
+    return r;
+};
+/**
+ * @since 1.0.0
+ */
+exports.failures = Either_1.left;
+/**
+ * @since 1.0.0
+ */
+exports.failure = function (value, context, message) {
+    return exports.failures([{ value: value, context: context, message: message }]);
+};
+/**
+ * @since 1.0.0
+ */
+exports.success = Either_1.right;
+var pushAll = function (xs, ys) {
+    var l = ys.length;
+    for (var i = 0; i < l; i++) {
+        xs.push(ys[i]);
+    }
+};
+//
+// basic types
+//
+/**
+ * @since 1.0.0
+ */
+var NullType = /** @class */ (function (_super) {
+    __extends(NullType, _super);
+    function NullType() {
+        var _this = _super.call(this, 'null', function (u) { return u === null; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'NullType';
+        return _this;
+    }
+    return NullType;
+}(Type));
+exports.NullType = NullType;
+/**
+ * @since 1.0.0
+ */
+exports.nullType = new NullType();
+exports.null = exports.nullType;
+/**
+ * @since 1.0.0
+ */
+var UndefinedType = /** @class */ (function (_super) {
+    __extends(UndefinedType, _super);
+    function UndefinedType() {
+        var _this = _super.call(this, 'undefined', function (u) { return u === void 0; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'UndefinedType';
+        return _this;
+    }
+    return UndefinedType;
+}(Type));
+exports.UndefinedType = UndefinedType;
+var undefinedType = new UndefinedType();
+exports.undefined = undefinedType;
+/**
+ * @since 1.2.0
+ */
+var VoidType = /** @class */ (function (_super) {
+    __extends(VoidType, _super);
+    function VoidType() {
+        var _this = _super.call(this, 'void', undefinedType.is, undefinedType.validate, exports.identity) || this;
+        _this._tag = 'VoidType';
+        return _this;
+    }
+    return VoidType;
+}(Type));
+exports.VoidType = VoidType;
+/**
+ * @since 1.2.0
+ */
+exports.voidType = new VoidType();
+exports.void = exports.voidType;
+/**
+ * @since 1.5.0
+ */
+var UnknownType = /** @class */ (function (_super) {
+    __extends(UnknownType, _super);
+    function UnknownType() {
+        var _this = _super.call(this, 'unknown', function (_) { return true; }, exports.success, exports.identity) || this;
+        _this._tag = 'UnknownType';
+        return _this;
+    }
+    return UnknownType;
+}(Type));
+exports.UnknownType = UnknownType;
+/**
+ * @since 1.5.0
+ */
+exports.unknown = new UnknownType();
+/**
+ * @since 1.0.0
+ */
+var StringType = /** @class */ (function (_super) {
+    __extends(StringType, _super);
+    function StringType() {
+        var _this = _super.call(this, 'string', function (u) { return typeof u === 'string'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'StringType';
+        return _this;
+    }
+    return StringType;
+}(Type));
+exports.StringType = StringType;
+/**
+ * @since 1.0.0
+ */
+exports.string = new StringType();
+/**
+ * @since 1.0.0
+ */
+var NumberType = /** @class */ (function (_super) {
+    __extends(NumberType, _super);
+    function NumberType() {
+        var _this = _super.call(this, 'number', function (u) { return typeof u === 'number'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'NumberType';
+        return _this;
+    }
+    return NumberType;
+}(Type));
+exports.NumberType = NumberType;
+/**
+ * @since 1.0.0
+ */
+exports.number = new NumberType();
+/**
+ * @since 2.1.0
+ */
+var BigIntType = /** @class */ (function (_super) {
+    __extends(BigIntType, _super);
+    function BigIntType() {
+        var _this = _super.call(this, 'bigint', 
+        // tslint:disable-next-line: valid-typeof
+        function (u) { return typeof u === 'bigint'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'BigIntType';
+        return _this;
+    }
+    return BigIntType;
+}(Type));
+exports.BigIntType = BigIntType;
+/**
+ * @since 2.1.0
+ */
+exports.bigint = new BigIntType();
+/**
+ * @since 1.0.0
+ */
+var BooleanType = /** @class */ (function (_super) {
+    __extends(BooleanType, _super);
+    function BooleanType() {
+        var _this = _super.call(this, 'boolean', function (u) { return typeof u === 'boolean'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'BooleanType';
+        return _this;
+    }
+    return BooleanType;
+}(Type));
+exports.BooleanType = BooleanType;
+/**
+ * @since 1.0.0
+ */
+exports.boolean = new BooleanType();
+/**
+ * @since 1.0.0
+ */
+var AnyArrayType = /** @class */ (function (_super) {
+    __extends(AnyArrayType, _super);
+    function AnyArrayType() {
+        var _this = _super.call(this, 'UnknownArray', Array.isArray, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'AnyArrayType';
+        return _this;
+    }
+    return AnyArrayType;
+}(Type));
+exports.AnyArrayType = AnyArrayType;
+/**
+ * @since 1.7.1
+ */
+exports.UnknownArray = new AnyArrayType();
+exports.Array = exports.UnknownArray;
+/**
+ * @since 1.0.0
+ */
+var AnyDictionaryType = /** @class */ (function (_super) {
+    __extends(AnyDictionaryType, _super);
+    function AnyDictionaryType() {
+        var _this = _super.call(this, 'UnknownRecord', function (u) {
+            var s = Object.prototype.toString.call(u);
+            return s === '[object Object]' || s === '[object Window]';
+        }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'AnyDictionaryType';
+        return _this;
+    }
+    return AnyDictionaryType;
+}(Type));
+exports.AnyDictionaryType = AnyDictionaryType;
+/**
+ * @since 1.7.1
+ */
+exports.UnknownRecord = new AnyDictionaryType();
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+var FunctionType = /** @class */ (function (_super) {
+    __extends(FunctionType, _super);
+    function FunctionType() {
+        var _this = _super.call(this, 'Function', 
+        // tslint:disable-next-line:strict-type-predicates
+        function (u) { return typeof u === 'function'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'FunctionType';
+        return _this;
+    }
+    return FunctionType;
+}(Type));
+exports.FunctionType = FunctionType;
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+// tslint:disable-next-line: deprecation
+exports.Function = new FunctionType();
+/**
+ * @since 1.0.0
+ */
+var RefinementType = /** @class */ (function (_super) {
+    __extends(RefinementType, _super);
+    function RefinementType(name, is, validate, encode, type, predicate) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.type = type;
+        _this.predicate = predicate;
+        _this._tag = 'RefinementType';
+        return _this;
+    }
+    return RefinementType;
+}(Type));
+exports.RefinementType = RefinementType;
+/**
+ * @since 1.8.1
+ */
+exports.brand = function (codec, predicate, name) {
+    // tslint:disable-next-line: deprecation
+    return refinement(codec, predicate, name);
+};
+/**
+ * A branded codec representing an integer
+ * @since 1.8.1
+ */
+exports.Int = exports.brand(exports.number, function (n) { return Number.isInteger(n); }, 'Int');
+/**
+ * @since 1.0.0
+ */
+var LiteralType = /** @class */ (function (_super) {
+    __extends(LiteralType, _super);
+    function LiteralType(name, is, validate, encode, value) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.value = value;
+        _this._tag = 'LiteralType';
+        return _this;
+    }
+    return LiteralType;
+}(Type));
+exports.LiteralType = LiteralType;
+/**
+ * @since 1.0.0
+ */
+exports.literal = function (value, name) {
+    if (name === void 0) { name = JSON.stringify(value); }
+    var is = function (u) { return u === value; };
+    return new LiteralType(name, is, function (u, c) { return (is(u) ? exports.success(value) : exports.failure(u, c)); }, exports.identity, value);
+};
+/**
+ * @since 1.0.0
+ */
+var KeyofType = /** @class */ (function (_super) {
+    __extends(KeyofType, _super);
+    function KeyofType(name, is, validate, encode, keys) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.keys = keys;
+        _this._tag = 'KeyofType';
+        return _this;
+    }
+    return KeyofType;
+}(Type));
+exports.KeyofType = KeyofType;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+/**
+ * @since 1.0.0
+ */
+exports.keyof = function (keys, name) {
+    if (name === void 0) { name = Object.keys(keys)
+        .map(function (k) { return JSON.stringify(k); })
+        .join(' | '); }
+    var is = function (u) { return exports.string.is(u) && hasOwnProperty.call(keys, u); };
+    return new KeyofType(name, is, function (u, c) { return (is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity, keys);
+};
+/**
+ * @since 1.0.0
+ */
+var RecursiveType = /** @class */ (function (_super) {
+    __extends(RecursiveType, _super);
+    function RecursiveType(name, is, validate, encode, runDefinition) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.runDefinition = runDefinition;
+        _this._tag = 'RecursiveType';
+        return _this;
+    }
+    return RecursiveType;
+}(Type));
+exports.RecursiveType = RecursiveType;
+Object.defineProperty(RecursiveType.prototype, 'type', {
+    get: function () {
+        return this.runDefinition();
+    },
+    enumerable: true,
+    configurable: true
+});
+/**
+ * @since 1.0.0
+ */
+exports.recursion = function (name, definition) {
+    var cache;
+    var runDefinition = function () {
+        if (!cache) {
+            cache = definition(Self);
+            cache.name = name;
+        }
+        return cache;
+    };
+    var Self = new RecursiveType(name, function (u) { return runDefinition().is(u); }, function (u, c) { return runDefinition().validate(u, c); }, function (a) { return runDefinition().encode(a); }, runDefinition);
+    return Self;
+};
+/**
+ * @since 1.0.0
+ */
+var ArrayType = /** @class */ (function (_super) {
+    __extends(ArrayType, _super);
+    function ArrayType(name, is, validate, encode, type) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.type = type;
+        _this._tag = 'ArrayType';
+        return _this;
+    }
+    return ArrayType;
+}(Type));
+exports.ArrayType = ArrayType;
+/**
+ * @since 1.0.0
+ */
+exports.array = function (codec, name) {
+    if (name === void 0) { name = "Array<" + codec.name + ">"; }
+    return new ArrayType(name, function (u) { return exports.UnknownArray.is(u) && u.every(codec.is); }, function (u, c) {
+        return chain(exports.UnknownArray.validate(u, c), function (us) {
+            var len = us.length;
+            var as = us;
+            var errors = [];
+            for (var i = 0; i < len; i++) {
+                var ui = us[i];
+                var result = codec.validate(ui, exports.appendContext(c, String(i), codec, ui));
+                if (Either_1.isLeft(result)) {
+                    pushAll(errors, result.left);
+                }
+                else {
+                    var ai = result.right;
+                    if (ai !== ui) {
+                        if (as === us) {
+                            as = us.slice();
+                        }
+                        as[i] = ai;
+                    }
+                }
+            }
+            return errors.length > 0 ? exports.failures(errors) : exports.success(as);
+        });
+    }, codec.encode === exports.identity ? exports.identity : function (a) { return a.map(codec.encode); }, codec);
+};
+/**
+ * @since 1.0.0
+ */
+var InterfaceType = /** @class */ (function (_super) {
+    __extends(InterfaceType, _super);
+    function InterfaceType(name, is, validate, encode, props) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.props = props;
+        _this._tag = 'InterfaceType';
+        return _this;
+    }
+    return InterfaceType;
+}(Type));
+exports.InterfaceType = InterfaceType;
+var getNameFromProps = function (props) {
+    return Object.keys(props)
+        .map(function (k) { return k + ": " + props[k].name; })
+        .join(', ');
+};
+var useIdentity = function (codecs) {
+    for (var i = 0; i < codecs.length; i++) {
+        if (codecs[i].encode !== exports.identity) {
+            return false;
+        }
+    }
+    return true;
+};
+var getInterfaceTypeName = function (props) {
+    return "{ " + getNameFromProps(props) + " }";
+};
+/**
+ * @since 1.0.0
+ */
+exports.type = function (props, name) {
+    if (name === void 0) { name = getInterfaceTypeName(props); }
+    var keys = Object.keys(props);
+    var types = keys.map(function (key) { return props[key]; });
+    var len = keys.length;
+    return new InterfaceType(name, function (u) {
+        if (exports.UnknownRecord.is(u)) {
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                if (!types[i].is(u[k])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }, function (u, c) {
+        return chain(exports.UnknownRecord.validate(u, c), function (o) {
+            var a = o;
+            var errors = [];
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                var ak = a[k];
+                var type_1 = types[i];
+                var result = type_1.validate(ak, exports.appendContext(c, k, type_1, ak));
+                if (Either_1.isLeft(result)) {
+                    pushAll(errors, result.left);
+                }
+                else {
+                    var vak = result.right;
+                    if (vak !== ak || (vak === undefined && !hasOwnProperty.call(a, k))) {
+                        /* istanbul ignore next */
+                        if (a === o) {
+                            a = __assign({}, o);
+                        }
+                        a[k] = vak;
+                    }
+                }
+            }
+            return errors.length > 0 ? exports.failures(errors) : exports.success(a);
+        });
+    }, useIdentity(types)
+        ? exports.identity
+        : function (a) {
+            var s = __assign({}, a);
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                var encode = types[i].encode;
+                if (encode !== exports.identity) {
+                    s[k] = encode(a[k]);
+                }
+            }
+            return s;
+        }, props);
+};
+exports.interface = exports.type;
+/**
+ * @since 1.0.0
+ */
+var PartialType = /** @class */ (function (_super) {
+    __extends(PartialType, _super);
+    function PartialType(name, is, validate, encode, props) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.props = props;
+        _this._tag = 'PartialType';
+        return _this;
+    }
+    return PartialType;
+}(Type));
+exports.PartialType = PartialType;
+var getPartialTypeName = function (inner) {
+    return "Partial<" + inner + ">";
+};
+/**
+ * @since 1.0.0
+ */
+exports.partial = function (props, name) {
+    if (name === void 0) { name = getPartialTypeName(getInterfaceTypeName(props)); }
+    var keys = Object.keys(props);
+    var types = keys.map(function (key) { return props[key]; });
+    var len = keys.length;
+    return new PartialType(name, function (u) {
+        if (exports.UnknownRecord.is(u)) {
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                var uk = u[k];
+                if (uk !== undefined && !props[k].is(uk)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }, function (u, c) {
+        return chain(exports.UnknownRecord.validate(u, c), function (o) {
+            var a = o;
+            var errors = [];
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                var ak = a[k];
+                var type_2 = props[k];
+                var result = type_2.validate(ak, exports.appendContext(c, k, type_2, ak));
+                if (Either_1.isLeft(result)) {
+                    if (ak !== undefined) {
+                        pushAll(errors, result.left);
+                    }
+                }
+                else {
+                    var vak = result.right;
+                    if (vak !== ak) {
+                        /* istanbul ignore next */
+                        if (a === o) {
+                            a = __assign({}, o);
+                        }
+                        a[k] = vak;
+                    }
+                }
+            }
+            return errors.length > 0 ? exports.failures(errors) : exports.success(a);
+        });
+    }, useIdentity(types)
+        ? exports.identity
+        : function (a) {
+            var s = __assign({}, a);
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                var ak = a[k];
+                if (ak !== undefined) {
+                    s[k] = types[i].encode(ak);
+                }
+            }
+            return s;
+        }, props);
+};
+/**
+ * @since 1.0.0
+ */
+var DictionaryType = /** @class */ (function (_super) {
+    __extends(DictionaryType, _super);
+    function DictionaryType(name, is, validate, encode, domain, codomain) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.domain = domain;
+        _this.codomain = codomain;
+        _this._tag = 'DictionaryType';
+        return _this;
+    }
+    return DictionaryType;
+}(Type));
+exports.DictionaryType = DictionaryType;
+function enumerableRecord(keys, domain, codomain, name) {
+    if (name === void 0) { name = "{ [K in " + domain.name + "]: " + codomain.name + " }"; }
+    var len = keys.length;
+    return new DictionaryType(name, function (u) { return exports.UnknownRecord.is(u) && keys.every(function (k) { return codomain.is(u[k]); }); }, function (u, c) {
+        return chain(exports.UnknownRecord.validate(u, c), function (o) {
+            var a = {};
+            var errors = [];
+            var changed = false;
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                var ok = o[k];
+                var codomainResult = codomain.validate(ok, exports.appendContext(c, k, codomain, ok));
+                if (Either_1.isLeft(codomainResult)) {
+                    pushAll(errors, codomainResult.left);
+                }
+                else {
+                    var vok = codomainResult.right;
+                    changed = changed || vok !== ok;
+                    a[k] = vok;
+                }
+            }
+            return errors.length > 0 ? exports.failures(errors) : exports.success((changed || Object.keys(o).length !== len ? a : o));
+        });
+    }, codomain.encode === exports.identity
+        ? exports.identity
+        : function (a) {
+            var s = {};
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                s[k] = codomain.encode(a[k]);
+            }
+            return s;
+        }, domain, codomain);
+}
+/**
+ * @internal
+ */
+function getDomainKeys(domain) {
+    var _a;
+    if (isLiteralC(domain)) {
+        var literal_1 = domain.value;
+        if (exports.string.is(literal_1)) {
+            return _a = {}, _a[literal_1] = null, _a;
+        }
+    }
+    else if (isKeyofC(domain)) {
+        return domain.keys;
+    }
+    else if (isUnionC(domain)) {
+        var keys = domain.types.map(function (type) { return getDomainKeys(type); });
+        return keys.some(undefinedType.is) ? undefined : Object.assign.apply(Object, __spreadArrays([{}], keys));
+    }
+    return undefined;
+}
+exports.getDomainKeys = getDomainKeys;
+function nonEnumerableRecord(domain, codomain, name) {
+    if (name === void 0) { name = "{ [K in " + domain.name + "]: " + codomain.name + " }"; }
+    return new DictionaryType(name, function (u) {
+        if (exports.UnknownRecord.is(u)) {
+            return Object.keys(u).every(function (k) { return domain.is(k) && codomain.is(u[k]); });
+        }
+        return isAnyC(codomain) && Array.isArray(u);
+    }, function (u, c) {
+        if (exports.UnknownRecord.is(u)) {
+            var a = {};
+            var errors = [];
+            var keys = Object.keys(u);
+            var len = keys.length;
+            var changed = false;
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                var ok = u[k];
+                var domainResult = domain.validate(k, exports.appendContext(c, k, domain, k));
+                if (Either_1.isLeft(domainResult)) {
+                    pushAll(errors, domainResult.left);
+                }
+                else {
+                    var vk = domainResult.right;
+                    changed = changed || vk !== k;
+                    k = vk;
+                    var codomainResult = codomain.validate(ok, exports.appendContext(c, k, codomain, ok));
+                    if (Either_1.isLeft(codomainResult)) {
+                        pushAll(errors, codomainResult.left);
+                    }
+                    else {
+                        var vok = codomainResult.right;
+                        changed = changed || vok !== ok;
+                        a[k] = vok;
+                    }
+                }
+            }
+            return errors.length > 0 ? exports.failures(errors) : exports.success((changed ? a : u));
+        }
+        if (isAnyC(codomain) && Array.isArray(u)) {
+            return exports.success(u);
+        }
+        return exports.failure(u, c);
+    }, domain.encode === exports.identity && codomain.encode === exports.identity
+        ? exports.identity
+        : function (a) {
+            var s = {};
+            var keys = Object.keys(a);
+            var len = keys.length;
+            for (var i = 0; i < len; i++) {
+                var k = keys[i];
+                s[String(domain.encode(k))] = codomain.encode(a[k]);
+            }
+            return s;
+        }, domain, codomain);
+}
+/**
+ * @since 1.7.1
+ */
+function record(domain, codomain, name) {
+    var keys = getDomainKeys(domain);
+    return keys
+        ? enumerableRecord(Object.keys(keys), domain, codomain, name)
+        : nonEnumerableRecord(domain, codomain, name);
+}
+exports.record = record;
+/**
+ * @since 1.0.0
+ */
+var UnionType = /** @class */ (function (_super) {
+    __extends(UnionType, _super);
+    function UnionType(name, is, validate, encode, types) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.types = types;
+        _this._tag = 'UnionType';
+        return _this;
+    }
+    return UnionType;
+}(Type));
+exports.UnionType = UnionType;
+var getUnionName = function (codecs) {
+    return '(' + codecs.map(function (type) { return type.name; }).join(' | ') + ')';
+};
+/**
+ * @since 1.0.0
+ */
+exports.union = function (codecs, name) {
+    if (name === void 0) { name = getUnionName(codecs); }
+    var index = getIndex(codecs);
+    if (index !== undefined && codecs.length > 0) {
+        var tag_1 = index[0], groups_1 = index[1];
+        var len_1 = groups_1.length;
+        var find_1 = function (value) {
+            for (var i = 0; i < len_1; i++) {
+                if (groups_1[i].indexOf(value) !== -1) {
+                    return i;
+                }
+            }
+            return undefined;
+        };
+        // tslint:disable-next-line: deprecation
+        return new TaggedUnionType(name, function (u) {
+            if (exports.UnknownRecord.is(u)) {
+                var i = find_1(u[tag_1]);
+                return i !== undefined ? codecs[i].is(u) : false;
+            }
+            return false;
+        }, function (u, c) {
+            return chain(exports.UnknownRecord.validate(u, c), function (r) {
+                var i = find_1(r[tag_1]);
+                if (i === undefined) {
+                    return exports.failure(u, c);
+                }
+                var codec = codecs[i];
+                return codec.validate(r, exports.appendContext(c, String(i), codec, r));
+            });
+        }, useIdentity(codecs)
+            ? exports.identity
+            : function (a) {
+                var i = find_1(a[tag_1]);
+                if (i === undefined) {
+                    // https://github.com/gcanti/io-ts/pull/305
+                    throw new Error("no codec found to encode value in union codec " + name);
+                }
+                else {
+                    return codecs[i].encode(a);
+                }
+            }, codecs, tag_1);
+    }
+    else {
+        return new UnionType(name, function (u) { return codecs.some(function (type) { return type.is(u); }); }, function (u, c) {
+            var errors = [];
+            for (var i = 0; i < codecs.length; i++) {
+                var codec = codecs[i];
+                var result = codec.validate(u, exports.appendContext(c, String(i), codec, u));
+                if (Either_1.isLeft(result)) {
+                    pushAll(errors, result.left);
+                }
+                else {
+                    return exports.success(result.right);
+                }
+            }
+            return exports.failures(errors);
+        }, useIdentity(codecs)
+            ? exports.identity
+            : function (a) {
+                for (var _i = 0, codecs_1 = codecs; _i < codecs_1.length; _i++) {
+                    var codec = codecs_1[_i];
+                    if (codec.is(a)) {
+                        return codec.encode(a);
+                    }
+                }
+                // https://github.com/gcanti/io-ts/pull/305
+                throw new Error("no codec found to encode value in union type " + name);
+            }, codecs);
+    }
+};
+/**
+ * @since 1.0.0
+ */
+var IntersectionType = /** @class */ (function (_super) {
+    __extends(IntersectionType, _super);
+    function IntersectionType(name, is, validate, encode, types) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.types = types;
+        _this._tag = 'IntersectionType';
+        return _this;
+    }
+    return IntersectionType;
+}(Type));
+exports.IntersectionType = IntersectionType;
+var mergeAll = function (base, us) {
+    var equal = true;
+    var primitive = true;
+    for (var _i = 0, us_1 = us; _i < us_1.length; _i++) {
+        var u = us_1[_i];
+        if (u !== base) {
+            equal = false;
+        }
+        if (exports.UnknownRecord.is(u)) {
+            primitive = false;
+        }
+    }
+    if (equal) {
+        return base;
+    }
+    else if (primitive) {
+        return us[us.length - 1];
+    }
+    var r = {};
+    for (var _a = 0, us_2 = us; _a < us_2.length; _a++) {
+        var u = us_2[_a];
+        for (var k in u) {
+            if (u[k] !== base[k] || !r.hasOwnProperty(k)) {
+                r[k] = u[k];
+            }
+        }
+    }
+    return r;
+};
+function intersection(codecs, name) {
+    if (name === void 0) { name = "(" + codecs.map(function (type) { return type.name; }).join(' & ') + ")"; }
+    var len = codecs.length;
+    return new IntersectionType(name, function (u) { return codecs.every(function (type) { return type.is(u); }); }, codecs.length === 0
+        ? exports.success
+        : function (u, c) {
+            var us = [];
+            var errors = [];
+            for (var i = 0; i < len; i++) {
+                var codec = codecs[i];
+                var result = codec.validate(u, exports.appendContext(c, String(i), codec, u));
+                if (Either_1.isLeft(result)) {
+                    pushAll(errors, result.left);
+                }
+                else {
+                    us.push(result.right);
+                }
+            }
+            return errors.length > 0 ? exports.failures(errors) : exports.success(mergeAll(u, us));
+        }, codecs.length === 0
+        ? exports.identity
+        : function (a) {
+            return mergeAll(a, codecs.map(function (codec) { return codec.encode(a); }));
+        }, codecs);
+}
+exports.intersection = intersection;
+/**
+ * @since 1.0.0
+ */
+var TupleType = /** @class */ (function (_super) {
+    __extends(TupleType, _super);
+    function TupleType(name, is, validate, encode, types) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.types = types;
+        _this._tag = 'TupleType';
+        return _this;
+    }
+    return TupleType;
+}(Type));
+exports.TupleType = TupleType;
+function tuple(codecs, name) {
+    if (name === void 0) { name = "[" + codecs.map(function (type) { return type.name; }).join(', ') + "]"; }
+    var len = codecs.length;
+    return new TupleType(name, function (u) { return exports.UnknownArray.is(u) && u.length === len && codecs.every(function (type, i) { return type.is(u[i]); }); }, function (u, c) {
+        return chain(exports.UnknownArray.validate(u, c), function (us) {
+            var as = us.length > len ? us.slice(0, len) : us; // strip additional components
+            var errors = [];
+            for (var i = 0; i < len; i++) {
+                var a = us[i];
+                var type_3 = codecs[i];
+                var result = type_3.validate(a, exports.appendContext(c, String(i), type_3, a));
+                if (Either_1.isLeft(result)) {
+                    pushAll(errors, result.left);
+                }
+                else {
+                    var va = result.right;
+                    if (va !== a) {
+                        /* istanbul ignore next */
+                        if (as === us) {
+                            as = us.slice();
+                        }
+                        as[i] = va;
+                    }
+                }
+            }
+            return errors.length > 0 ? exports.failures(errors) : exports.success(as);
+        });
+    }, useIdentity(codecs) ? exports.identity : function (a) { return codecs.map(function (type, i) { return type.encode(a[i]); }); }, codecs);
+}
+exports.tuple = tuple;
+/**
+ * @since 1.0.0
+ */
+var ReadonlyType = /** @class */ (function (_super) {
+    __extends(ReadonlyType, _super);
+    function ReadonlyType(name, is, validate, encode, type) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.type = type;
+        _this._tag = 'ReadonlyType';
+        return _this;
+    }
+    return ReadonlyType;
+}(Type));
+exports.ReadonlyType = ReadonlyType;
+/**
+ * @since 1.0.0
+ */
+exports.readonly = function (codec, name) {
+    if (name === void 0) { name = "Readonly<" + codec.name + ">"; }
+    return new ReadonlyType(name, codec.is, function (u, c) {
+        return map(codec.validate(u, c), function (x) {
+            if (process.env.NODE_ENV !== 'production') {
+                return Object.freeze(x);
+            }
+            return x;
+        });
+    }, codec.encode === exports.identity ? exports.identity : codec.encode, codec);
+};
+/**
+ * @since 1.0.0
+ */
+var ReadonlyArrayType = /** @class */ (function (_super) {
+    __extends(ReadonlyArrayType, _super);
+    function ReadonlyArrayType(name, is, validate, encode, type) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.type = type;
+        _this._tag = 'ReadonlyArrayType';
+        return _this;
+    }
+    return ReadonlyArrayType;
+}(Type));
+exports.ReadonlyArrayType = ReadonlyArrayType;
+/**
+ * @since 1.0.0
+ */
+exports.readonlyArray = function (codec, name) {
+    if (name === void 0) { name = "ReadonlyArray<" + codec.name + ">"; }
+    var arrayType = exports.array(codec);
+    return new ReadonlyArrayType(name, arrayType.is, function (u, c) {
+        return map(arrayType.validate(u, c), function (x) {
+            if (process.env.NODE_ENV !== 'production') {
+                return Object.freeze(x);
+            }
+            return x;
+        });
+    }, arrayType.encode, codec);
+};
+/**
+ * Strips additional properties
+ * @since 1.0.0
+ */
+exports.strict = function (props, name) {
+    return exports.exact(exports.type(props), name);
+};
+/**
+ * @since 1.3.0
+ * @deprecated
+ */
+var TaggedUnionType = /** @class */ (function (_super) {
+    __extends(TaggedUnionType, _super);
+    function TaggedUnionType(name, 
+    // tslint:disable-next-line: deprecation
+    is, 
+    // tslint:disable-next-line: deprecation
+    validate, 
+    // tslint:disable-next-line: deprecation
+    encode, codecs, tag) {
+        var _this = _super.call(this, name, is, validate, encode, codecs) /* istanbul ignore next */ // <= workaround for https://github.com/Microsoft/TypeScript/issues/13455
+         || this;
+        _this.tag = tag;
+        return _this;
+    }
+    return TaggedUnionType;
+}(UnionType));
+exports.TaggedUnionType = TaggedUnionType;
+/**
+ * Use `union` instead
+ *
+ * @since 1.3.0
+ * @deprecated
+ */
+exports.taggedUnion = function (tag, codecs, name
+// tslint:disable-next-line: deprecation
+) {
+    if (name === void 0) { name = getUnionName(codecs); }
+    var U = exports.union(codecs, name);
+    // tslint:disable-next-line: deprecation
+    if (U instanceof TaggedUnionType) {
+        return U;
+    }
+    else {
+        console.warn("[io-ts] Cannot build a tagged union for " + name + ", returning a de-optimized union");
+        // tslint:disable-next-line: deprecation
+        return new TaggedUnionType(name, U.is, U.validate, U.encode, codecs, tag);
+    }
+};
+/**
+ * @since 1.1.0
+ */
+var ExactType = /** @class */ (function (_super) {
+    __extends(ExactType, _super);
+    function ExactType(name, is, validate, encode, type) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.type = type;
+        _this._tag = 'ExactType';
+        return _this;
+    }
+    return ExactType;
+}(Type));
+exports.ExactType = ExactType;
+var getProps = function (codec) {
+    switch (codec._tag) {
+        case 'RefinementType':
+        case 'ReadonlyType':
+            return getProps(codec.type);
+        case 'InterfaceType':
+        case 'StrictType':
+        case 'PartialType':
+            return codec.props;
+        case 'IntersectionType':
+            return codec.types.reduce(function (props, type) { return Object.assign(props, getProps(type)); }, {});
+    }
+};
+var stripKeys = function (o, props) {
+    var keys = Object.getOwnPropertyNames(o);
+    var shouldStrip = false;
+    var r = {};
+    for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        if (!hasOwnProperty.call(props, key)) {
+            shouldStrip = true;
+        }
+        else {
+            r[key] = o[key];
+        }
+    }
+    return shouldStrip ? r : o;
+};
+var getExactTypeName = function (codec) {
+    if (isTypeC(codec)) {
+        return "{| " + getNameFromProps(codec.props) + " |}";
+    }
+    else if (isPartialC(codec)) {
+        return getPartialTypeName("{| " + getNameFromProps(codec.props) + " |}");
+    }
+    return "Exact<" + codec.name + ">";
+};
+/**
+ * Strips additional properties
+ * @since 1.1.0
+ */
+exports.exact = function (codec, name) {
+    if (name === void 0) { name = getExactTypeName(codec); }
+    var props = getProps(codec);
+    return new ExactType(name, codec.is, function (u, c) { return chain(exports.UnknownRecord.validate(u, c), function () { return map(codec.validate(u, c), function (a) { return stripKeys(a, props); }); }); }, function (a) { return codec.encode(stripKeys(a, props)); }, codec);
+};
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+exports.getValidationError /* istanbul ignore next */ = function (value, context) { return ({
+    value: value,
+    context: context
+}); };
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+exports.getDefaultContext /* istanbul ignore next */ = function (decoder) { return [
+    { key: '', type: decoder }
+]; };
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+var NeverType = /** @class */ (function (_super) {
+    __extends(NeverType, _super);
+    function NeverType() {
+        var _this = _super.call(this, 'never', function (_) { return false; }, function (u, c) { return exports.failure(u, c); }, 
+        /* istanbul ignore next */
+        function () {
+            throw new Error('cannot encode never');
+        }) || this;
+        _this._tag = 'NeverType';
+        return _this;
+    }
+    return NeverType;
+}(Type));
+exports.NeverType = NeverType;
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+// tslint:disable-next-line: deprecation
+exports.never = new NeverType();
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+var AnyType = /** @class */ (function (_super) {
+    __extends(AnyType, _super);
+    function AnyType() {
+        var _this = _super.call(this, 'any', function (_) { return true; }, exports.success, exports.identity) || this;
+        _this._tag = 'AnyType';
+        return _this;
+    }
+    return AnyType;
+}(Type));
+exports.AnyType = AnyType;
+/**
+ * Use `unknown` instead
+ * @since 1.0.0
+ * @deprecated
+ */
+// tslint:disable-next-line: deprecation
+exports.any = new AnyType();
+/**
+ * Use `UnknownRecord` instead
+ * @since 1.0.0
+ * @deprecated
+ */
+exports.Dictionary = exports.UnknownRecord;
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+var ObjectType = /** @class */ (function (_super) {
+    __extends(ObjectType, _super);
+    function ObjectType() {
+        var _this = _super.call(this, 'object', function (u) { return u !== null && typeof u === 'object'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        _this._tag = 'ObjectType';
+        return _this;
+    }
+    return ObjectType;
+}(Type));
+exports.ObjectType = ObjectType;
+/**
+ * Use `UnknownRecord` instead
+ * @since 1.0.0
+ * @deprecated
+ */
+// tslint:disable-next-line: deprecation
+exports.object = new ObjectType();
+/**
+ * Use `brand` instead
+ * @since 1.0.0
+ * @deprecated
+ */
+function refinement(codec, predicate, name) {
+    if (name === void 0) { name = "(" + codec.name + " | " + exports.getFunctionName(predicate) + ")"; }
+    return new RefinementType(name, function (u) { return codec.is(u) && predicate(u); }, function (i, c) { return chain(codec.validate(i, c), function (a) { return (predicate(a) ? exports.success(a) : exports.failure(a, c)); }); }, codec.encode, codec, predicate);
+}
+exports.refinement = refinement;
+/**
+ * Use `Int` instead
+ * @since 1.0.0
+ * @deprecated
+ */
+// tslint:disable-next-line: deprecation
+exports.Integer = refinement(exports.number, Number.isInteger, 'Integer');
+/**
+ * Use `record` instead
+ * @since 1.0.0
+ * @deprecated
+ */
+exports.dictionary = record;
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+var StrictType = /** @class */ (function (_super) {
+    __extends(StrictType, _super);
+    function StrictType(name, 
+    // tslint:disable-next-line: deprecation
+    is, 
+    // tslint:disable-next-line: deprecation
+    validate, 
+    // tslint:disable-next-line: deprecation
+    encode, props) {
+        var _this = _super.call(this, name, is, validate, encode) || this;
+        _this.props = props;
+        _this._tag = 'StrictType';
+        return _this;
+    }
+    return StrictType;
+}(Type));
+exports.StrictType = StrictType;
+/**
+ * Drops the codec "kind"
+ * @since 1.1.0
+ * @deprecated
+ */
+function clean(codec) {
+    return codec;
+}
+exports.clean = clean;
+function alias(codec) {
+    return function () { return codec; };
+}
+exports.alias = alias;
+var isNonEmpty = function (as) { return as.length > 0; };
+/**
+ * @internal
+ */
+exports.emptyTags = {};
+function intersect(a, b) {
+    var r = [];
+    for (var _i = 0, a_1 = a; _i < a_1.length; _i++) {
+        var v = a_1[_i];
+        if (b.indexOf(v) !== -1) {
+            r.push(v);
+        }
+    }
+    return r;
+}
+function mergeTags(a, b) {
+    if (a === exports.emptyTags) {
+        return b;
+    }
+    if (b === exports.emptyTags) {
+        return a;
+    }
+    var r = Object.assign({}, a);
+    for (var k in b) {
+        if (a.hasOwnProperty(k)) {
+            var intersection_1 = intersect(a[k], b[k]);
+            if (isNonEmpty(intersection_1)) {
+                r[k] = intersection_1;
+            }
+            else {
+                r = exports.emptyTags;
+                break;
+            }
+        }
+        else {
+            r[k] = b[k];
+        }
+    }
+    return r;
+}
+function intersectTags(a, b) {
+    if (a === exports.emptyTags || b === exports.emptyTags) {
+        return exports.emptyTags;
+    }
+    var r = exports.emptyTags;
+    for (var k in a) {
+        if (b.hasOwnProperty(k)) {
+            var intersection_2 = intersect(a[k], b[k]);
+            if (intersection_2.length === 0) {
+                if (r === exports.emptyTags) {
+                    r = {};
+                }
+                r[k] = a[k].concat(b[k]);
+            }
+        }
+    }
+    return r;
+}
+// tslint:disable-next-line: deprecation
+function isAnyC(codec) {
+    return codec._tag === 'AnyType';
+}
+function isLiteralC(codec) {
+    return codec._tag === 'LiteralType';
+}
+function isKeyofC(codec) {
+    return codec._tag === 'KeyofType';
+}
+function isTypeC(codec) {
+    return codec._tag === 'InterfaceType';
+}
+function isPartialC(codec) {
+    return codec._tag === 'PartialType';
+}
+// tslint:disable-next-line: deprecation
+function isStrictC(codec) {
+    return codec._tag === 'StrictType';
+}
+function isExactC(codec) {
+    return codec._tag === 'ExactType';
+}
+// tslint:disable-next-line: deprecation
+function isRefinementC(codec) {
+    return codec._tag === 'RefinementType';
+}
+function isIntersectionC(codec) {
+    return codec._tag === 'IntersectionType';
+}
+function isUnionC(codec) {
+    return codec._tag === 'UnionType';
+}
+function isRecursiveC(codec) {
+    return codec._tag === 'RecursiveType';
+}
+var lazyCodecs = [];
+/**
+ * @internal
+ */
+function getTags(codec) {
+    if (lazyCodecs.indexOf(codec) !== -1) {
+        return exports.emptyTags;
+    }
+    if (isTypeC(codec) || isStrictC(codec)) {
+        var index = exports.emptyTags;
+        // tslint:disable-next-line: forin
+        for (var k in codec.props) {
+            var prop = codec.props[k];
+            if (isLiteralC(prop)) {
+                if (index === exports.emptyTags) {
+                    index = {};
+                }
+                index[k] = [prop.value];
+            }
+        }
+        return index;
+    }
+    else if (isExactC(codec) || isRefinementC(codec)) {
+        return getTags(codec.type);
+    }
+    else if (isIntersectionC(codec)) {
+        return codec.types.reduce(function (tags, codec) { return mergeTags(tags, getTags(codec)); }, exports.emptyTags);
+    }
+    else if (isUnionC(codec)) {
+        return codec.types.slice(1).reduce(function (tags, codec) { return intersectTags(tags, getTags(codec)); }, getTags(codec.types[0]));
+    }
+    else if (isRecursiveC(codec)) {
+        lazyCodecs.push(codec);
+        var tags = getTags(codec.type);
+        lazyCodecs.pop();
+        return tags;
+    }
+    return exports.emptyTags;
+}
+exports.getTags = getTags;
+/**
+ * @internal
+ */
+function getIndex(codecs) {
+    var tags = getTags(codecs[0]);
+    var keys = Object.keys(tags);
+    var len = codecs.length;
+    var _loop_1 = function (k) {
+        var all = tags[k].slice();
+        var index = [tags[k]];
+        for (var i = 1; i < len; i++) {
+            var codec = codecs[i];
+            var ctags = getTags(codec);
+            var values = ctags[k];
+            // tslint:disable-next-line: strict-type-predicates
+            if (values === undefined) {
+                return "continue-keys";
+            }
+            else {
+                if (values.some(function (v) { return all.indexOf(v) !== -1; })) {
+                    return "continue-keys";
+                }
+                else {
+                    all.push.apply(all, values);
+                    index.push(values);
+                }
+            }
+        }
+        return { value: [k, index] };
+    };
+    keys: for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+        var k = keys_1[_i];
+        var state_1 = _loop_1(k);
+        if (typeof state_1 === "object")
+            return state_1.value;
+        switch (state_1) {
+            case "continue-keys": continue keys;
+        }
+    }
+    return undefined;
+}
+exports.getIndex = getIndex;
 
 
 /***/ }),

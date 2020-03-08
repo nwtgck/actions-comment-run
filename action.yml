@@ -4,6 +4,10 @@ author: 'Ryo Ota <nwtgck@nwtgck.org>'
 inputs:
   github-token:
     description: 'GitHub token'
+    required: true
+  allowed-associations:
+    description: Comment author associations allowed to execute scripts (e.g. '["OWNER", "COLLABORATOR"]')
+    default: '["OWNER"]'
 runs:
   using: 'node12'
   main: 'dist/index.js'

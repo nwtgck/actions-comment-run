@@ -8,6 +8,10 @@ import {
 import nodeFetch from 'node-fetch'
 import {execSync as childProcessExecSync} from 'child_process'
 import * as marked from 'marked'
+import * as t from 'io-ts'
+import {isRight} from 'fp-ts/lib/Either'
+
+const commentAuthorAssociationsType = t.array(t.string)
 
 const commentPrefix = '@github-actions run'
 
@@ -33,13 +37,27 @@ async function run(): Promise<void> {
         )
         return
       }
+      // Get allowed associations
+      const allowedAssociationsStr = core.getInput('allowed-associations')
+      // Parse and validate
+      const allowedAssociationsEither = commentAuthorAssociationsType.decode(
+        JSON.parse(allowedAssociationsStr)
+      )
+      if (!isRight(allowedAssociationsEither)) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`
+        )
+        return
+      }
+      const allowedAssociations: string[] = allowedAssociationsEither.right
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const association = (context.payload as any).comment.author_association
-      // If commenting user has no write permission
-      if (!(association === 'OWNER' || association === 'COLLABORATOR')) {
+      // If commenting user is not allowed to run scripts
+      if (!allowedAssociations.includes(association)) {
         // eslint-disable-next-line no-console
         console.warn(
-          `NOTE: The owner and the collaborators can trigger this action, but you are ${association}.`
+          `NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`
         )
         return
       }
@@ -47,12 +65,12 @@ async function run(): Promise<void> {
       const githubClient = new GitHub(githubToken)
       // Parse the comment
       const tokens = marked.lexer(comment)
-      for (const t of tokens) {
-        if (t.type === 'code') {
-          if (t.lang === 'js' || t.lang === 'javascript') {
+      for (const token of tokens) {
+        if (token.type === 'code') {
+          if (token.lang === 'js' || token.lang === 'javascript') {
             // Eval JavaScript
             // NOTE: Eval result can be promise
-            await eval(t.text)
+            await eval(token.text)
           }
         }
       }
