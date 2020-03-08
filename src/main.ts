@@ -5,11 +5,13 @@ import {
   context as githubContext,
   GitHub as actionsGitHub
 } from '@actions/github'
+import * as exec from '@actions/exec'
 import nodeFetch from 'node-fetch'
-import {execSync as childProcessExecSync} from 'child_process'
+import {execSync as childProcessExecSync, spawn} from 'child_process'
 import * as marked from 'marked'
 import * as t from 'io-ts'
 import {isRight} from 'fp-ts/lib/Either'
+import * as fs from 'fs'
 
 const commentAuthorAssociationsType = t.array(t.string)
 
@@ -71,6 +73,9 @@ async function run(): Promise<void> {
             // Eval JavaScript
             // NOTE: Eval result can be promise
             await eval(token.text)
+          } else if (token.text.startsWith('#!')) {
+            // Execute script with shebang
+            await executeShebangScript(token.text)
           }
         }
       }
@@ -80,6 +85,44 @@ async function run(): Promise<void> {
     }
   } catch (error) {
     core.setFailed(error.message)
+  }
+}
+
+function createTmpFileName(): string {
+  const prefix = 'tmp_'
+  const len = 32
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const fileName = `${prefix}${randomString(len)}`
+    if (!fs.existsSync(fileName)) return fileName
+  }
+}
+
+// (base: https://stackoverflow.com/a/1349426/2885946)
+function randomString(length: number): string {
+  let result = ''
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const charactersLength = characters.length
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+  return result
+}
+
+async function executeShebangScript(script: string): Promise<void> {
+  // NOTE: Executing file in /tmp cause the error "UnhandledPromiseRejectionWarning: Error: There was an error when attempting to execute the process '/tmp/tmp-26373utihbUOauHW'. This may indicate the process failed to start. Error: spawn /tmp/tmp-26373utihbUOauHW ENOENT"
+  const fpath = createTmpFileName()
+  try {
+    fs.writeFileSync(fpath, script)
+    fs.chmodSync(fpath, 0o777)
+    await exec.exec(`./${fpath}`, [], {
+      outStream: process.stdout,
+      errStream: process.stderr
+    })
+  } finally {
+    // Remove file
+    fs.unlinkSync(fpath)
   }
 }
 
