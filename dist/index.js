@@ -4377,64 +4377,63 @@ function run() {
             // Avoid mangling
             const execSync = child_process_1.execSync;
             const githubToken = core.getInput('github-token', { required: true });
-            if (context.eventName === 'issue_comment') {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const comment = context.payload.comment.body;
-                // If not command-run-request comment
-                if (!comment.startsWith(commentPrefix)) {
-                    // eslint-disable-next-line no-console
-                    console.log(`HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`);
-                    return;
-                }
-                // Get allowed associations
-                const allowedAssociationsStr = core.getInput('allowed-associations');
-                // Parse and validate
-                const allowedAssociationsEither = commentAuthorAssociationsType.decode(JSON.parse(allowedAssociationsStr));
-                if (!Either_1.isRight(allowedAssociationsEither)) {
-                    // eslint-disable-next-line no-console
-                    console.error(`ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`);
-                    return;
-                }
-                const allowedAssociations = allowedAssociationsEither.right;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const association = context.payload.comment.author_association;
-                // If commenting user is not allowed to run scripts
-                if (!allowedAssociations.includes(association)) {
-                    // eslint-disable-next-line no-console
-                    console.warn(`NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`);
-                    return;
-                }
-                // Create GitHub client which can be used in the user script
-                const githubClient = new GitHub(githubToken);
-                // Post GitHub issue comment
-                const postComment = (body) => __awaiter(this, void 0, void 0, function* () {
-                    yield githubClient.issues.createComment({
-                        // eslint-disable-next-line @typescript-eslint/camelcase
-                        issue_number: context.issue.number,
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        body
-                    });
-                });
-                // Parse the comment
-                const tokens = marked.lexer(comment);
-                for (const token of tokens) {
-                    if (token.type === 'code') {
-                        if (token.lang === 'js' || token.lang === 'javascript') {
-                            // Eval JavaScript
-                            // NOTE: Eval result can be promise
-                            yield eval(token.text);
-                        }
-                        else if (token.text.startsWith('#!')) {
-                            // Execute script with shebang
-                            yield executeShebangScript(token.text);
-                        }
-                    }
-                }
-            }
-            else {
+            if (context.eventName !== 'issue_comment') {
                 // eslint-disable-next-line no-console
                 console.warn(`event name is not 'issue_comment': ${context.eventName}`);
+                return;
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const comment = context.payload.comment.body;
+            // If not command-run-request comment
+            if (!comment.startsWith(commentPrefix)) {
+                // eslint-disable-next-line no-console
+                console.log(`HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`);
+                return;
+            }
+            // Get allowed associations
+            const allowedAssociationsStr = core.getInput('allowed-associations');
+            // Parse and validate
+            const allowedAssociationsEither = commentAuthorAssociationsType.decode(JSON.parse(allowedAssociationsStr));
+            if (!Either_1.isRight(allowedAssociationsEither)) {
+                // eslint-disable-next-line no-console
+                console.error(`ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`);
+                return;
+            }
+            const allowedAssociations = allowedAssociationsEither.right;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const association = context.payload.comment.author_association;
+            // If commenting user is not allowed to run scripts
+            if (!allowedAssociations.includes(association)) {
+                // eslint-disable-next-line no-console
+                console.warn(`NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`);
+                return;
+            }
+            // Create GitHub client which can be used in the user script
+            const githubClient = new GitHub(githubToken);
+            // Post GitHub issue comment
+            const postComment = (body) => __awaiter(this, void 0, void 0, function* () {
+                yield githubClient.issues.createComment({
+                    // eslint-disable-next-line @typescript-eslint/camelcase
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body
+                });
+            });
+            // Parse the comment
+            const tokens = marked.lexer(comment);
+            for (const token of tokens) {
+                if (token.type === 'code') {
+                    if (token.lang === 'js' || token.lang === 'javascript') {
+                        // Eval JavaScript
+                        // NOTE: Eval result can be promise
+                        yield eval(token.text);
+                    }
+                    else if (token.text.startsWith('#!')) {
+                        // Execute script with shebang
+                        yield executeShebangScript(token.text);
+                    }
+                }
             }
         }
         catch (error) {
