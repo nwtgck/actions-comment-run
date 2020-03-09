@@ -49,6 +49,7 @@ You can introduce comment-run with the following command.
 ```bash
 mkdir -p .github/workflows/ && cd .github/workflows/ && wget https://gist.githubusercontent.com/nwtgck/a9b291f6869db42ecc3d9e30d0a0494c/raw/comment-run.yml
 ```
+After introducing this, create new issue or pull request and post `@github-actions run` comment.
 
 ## Useful examples
 
@@ -185,6 +186,7 @@ GitHub Actions do not pass `secrets` to pull request from forked repositories. T
 This comment allows you to go inside of GitHub Actions environment.
 
 <img src="doc_assets/ssh-over-piping-server.png" width="600" alt="SSH over Piping Server">
+<img src="doc_assets/ssh-over-piping-server-terminal.jpg" width="600" alt="SSH over Piping Server terminal">
 
 ````md
 @github-actions run
@@ -267,6 +269,32 @@ Thanks Cryolite!
 You can save "Saved replies" as follows.  
 Avatar icon > Settings > Saved replies
 
+
+## TIPS: Run other languages
+
+This action supports shebang (`#!`), so you can run shell and Python as follows.
+
+````md
+@github-actions run
+
+```sh
+#! /bin/sh
+pip install numpy
+```
+
+```py
+#! /usr/bin/python
+import numpy as np
+
+print(np.array([1, 2, 3]))
+```
+````
+
+Here are examples.
+- Deno: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596170740>
+- Go: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596176678>
+- Haskell: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596176131>
+- Scala: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596180626>
 
 ## TIPS: Use existing package, TypeScript and mange on GitHub
 
