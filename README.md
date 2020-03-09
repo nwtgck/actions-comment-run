@@ -296,7 +296,7 @@ Here are examples.
 - Haskell: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596176131>
 - Scala: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596180626>
 
-## TIPS: Use existing package, TypeScript and mange on GitHub
+## TIPS: Use existing package, TypeScript and manage on GitHub
 
 When your comment-run scripts are matured, you might  want to use TypeScript for maintainability.
 The following repository uses existing npm packages and TypeScript.  
