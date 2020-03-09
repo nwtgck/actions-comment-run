@@ -65,6 +65,16 @@ async function run(): Promise<void> {
       }
       // Create GitHub client which can be used in the user script
       const githubClient = new GitHub(githubToken)
+      // Post GitHub issue comment
+      const postComment = async (body: string): Promise<void> => {
+        await githubClient.issues.createComment({
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          issue_number: context.issue.number,
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          body
+        })
+      }
       // Parse the comment
       const tokens = marked.lexer(comment)
       for (const token of tokens) {

@@ -4406,6 +4406,16 @@ function run() {
                 }
                 // Create GitHub client which can be used in the user script
                 const githubClient = new GitHub(githubToken);
+                // Post GitHub issue comment
+                const postComment = (body) => __awaiter(this, void 0, void 0, function* () {
+                    yield githubClient.issues.createComment({
+                        // eslint-disable-next-line @typescript-eslint/camelcase
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body
+                    });
+                });
                 // Parse the comment
                 const tokens = marked.lexer(comment);
                 for (const token of tokens) {
