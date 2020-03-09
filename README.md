@@ -51,6 +51,17 @@ mkdir -p .github/workflows/ && cd .github/workflows/ && wget https://gist.github
 ```
 After introducing this, create new issue or pull request and post `@github-actions run` comment.
 
+## Comment author who can run scripts
+
+By default, only owner can execute the scripts. You can change `allowed-associations: '["OWNER"]'` in the yaml above.
+
+Here are examples.
+- `allowed-associations: '["OWNER"]'`
+- `allowed-associations: '["OWNER", "MEMBER"]'`
+- `allowed-associations: '["OWNER", "COLLABORATOR"]'`
+
+Learn more: [CommentAuthorAssociation | GitHub Developer Guide](https://developer.github.com/v4/enum/commentauthorassociation/)
+
 ## Useful examples
 
 ### LGTM Image
