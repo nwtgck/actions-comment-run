@@ -1,5 +1,5 @@
 name: 'Comment Run Actions'
-description: 'Run maintainer comments'
+description: 'Execute comment from issues and pull requests'
 author: 'Ryo Ota <nwtgck@nwtgck.org>'
 inputs:
   github-token:
