@@ -1,6 +1,6 @@
 {
   "name": "actions-comment-run",
-  "version": "0.1.0-SNAPSHOT",
+  "version": "1.0.0",
   "private": true,
   "description": "Comment run action",
   "main": "lib/main.js",
