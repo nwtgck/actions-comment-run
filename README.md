@@ -16,7 +16,7 @@ For shorter, you can use as follows.
 
 ```js
 (async () => {
-  await postComment("hello, world`");
+  await postComment("hello, world");
 })();
 ```
 ````
