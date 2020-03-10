@@ -33,17 +33,21 @@ async function run(): Promise<void> {
       console.warn(`event name is not 'issue_comment': ${context.eventName}`)
       return
     }
-    const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`
-    const permissionRes = await fetch(permissionUrl, {
-      headers: [
-        [
-          'Authorization',
-          `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString(
-            'base64'
-          )}`
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const callGithubApi = async (url: string): Promise<any> => {
+      return fetch(url, {
+        headers: [
+          [
+            'Authorization',
+            `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString(
+              'base64'
+            )}`
+          ]
         ]
-      ]
-    })
+      })
+    }
+    const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`
+    const permissionRes = await callGithubApi(permissionUrl)
     if (permissionRes.status !== 200) {
       // eslint-disable-next-line no-console
       console.error(

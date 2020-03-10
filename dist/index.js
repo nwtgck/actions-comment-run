@@ -4382,15 +4382,19 @@ function run() {
                 console.warn(`event name is not 'issue_comment': ${context.eventName}`);
                 return;
             }
-            const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`;
-            const permissionRes = yield fetch(permissionUrl, {
-                headers: [
-                    [
-                        'Authorization',
-                        `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString('base64')}`
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const callGithubApi = (url) => __awaiter(this, void 0, void 0, function* () {
+                return fetch(url, {
+                    headers: [
+                        [
+                            'Authorization',
+                            `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString('base64')}`
+                        ]
                     ]
-                ]
+                });
             });
+            const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`;
+            const permissionRes = yield callGithubApi(permissionUrl);
             if (permissionRes.status !== 200) {
                 // eslint-disable-next-line no-console
                 console.error(`Permission check returns non-200 status: ${permissionRes.status}`);
