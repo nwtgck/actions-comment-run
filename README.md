@@ -68,7 +68,7 @@ Learn more: [CommentAuthorAssociation | GitHub Developer Guide](https://develope
 
 Here are available variables and functions in the ```` ```js  ```` code block.
 
-| variable       | examples                                                                   | type or reference                                                                 |
+| variable       | examples                                                                   | type or reference                                                                  |
 |----------------|----------------------------------------------------------------------------|------------------------------------------------------------------------------------|
 | `context`      | `context.repo.owner`, `context.payload.comment`                            | [toolkit/context.ts at @actions/github@1.1.0 · actions/toolkit]                    |
 | `githubToken`  | `new GitHub(githubToken)`                                                  |                                                                                    |
@@ -78,7 +78,7 @@ Here are available variables and functions in the ```` ```js  ```` code block.
 | `GitHub`       | `new GitHub(githubToken)`                                                  | [toolkit/packages/github at master · actions/toolkit]                              |
 | `fetch`        | `await fetch("https://example.com")`                                       | [node-fetch/node-fetch: A light-weight module that brings window.fetch to Node.js] |
 | `core`         | `core.debug('my message')`                                                 | [toolkit/packages/core at master · actions/toolkit]                                |
-| `exec`         | `exec.exec("git status")`                                                  | [toolkit/packages/exec at master · actions/toolkit]                                |
+| `exec`         | `await exec.exec("git status")`                                            | [toolkit/packages/exec at master · actions/toolkit]                                |
 
 Other built-in variables and functions in Node.js such as `process` and `require(...)` are also available. This means you can use `process.env` for environment variables and `require('fs')` for file access.
 
