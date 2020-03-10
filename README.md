@@ -153,7 +153,7 @@ exec(`npm i ${depStr} ${devDepStr}`);
 
 exec("git status");
 exec("git add package*json");
-exec(`git commit -m 'chore(deps): update npm dependencies'`);
+exec(`git commit -m "chore(deps): update npm dependencies"`);
 exec(`git push -fu origin ${prBranchName}`);
 
 (async () => {
