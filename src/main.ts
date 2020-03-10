@@ -106,6 +106,19 @@ async function run(): Promise<void> {
     }
     // Create GitHub client which can be used in the user script
     const githubClient = new GitHub(githubToken)
+    // Add reaction
+    await githubClient.reactions
+      .createForIssueComment({
+        // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
+        comment_id: (context.payload as any).comment.id,
+        content: '+1',
+        owner: context.repo.owner,
+        repo: context.repo.repo
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.error('Add-reaction failed')
+      })
     // Post GitHub issue comment
     const postComment = async (body: string): Promise<void> => {
       await githubClient.issues.createComment({
