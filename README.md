@@ -53,6 +53,8 @@ After introducing this, create new issue or pull request and post `@github-actio
 
 ## Comment author who can run scripts
 
+Only accounts who have admin or write permission can execute the comment on your repository. (ref: [Collaborators | GitHub Developer Guide](https://developer.github.com/v3/repos/collaborators/#review-a-users-permission-level))
+
 By default, only owner can execute the scripts. You can change `allowed-associations: '["OWNER"]'` in the yaml above.
 
 Here are examples.
