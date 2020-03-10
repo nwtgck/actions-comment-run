@@ -106,18 +106,18 @@ async function run(): Promise<void> {
     }
     // Create GitHub client which can be used in the user script
     const githubClient = new GitHub(githubToken)
-    // Add reaction
-    await githubClient.reactions
+    // Add :eyes: reaction
+    const reactionRes = await githubClient.reactions
       .createForIssueComment({
         // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
         comment_id: (context.payload as any).comment.id,
-        content: '+1',
+        content: 'eyes',
         owner: context.repo.owner,
         repo: context.repo.repo
       })
       .catch(err => {
         // eslint-disable-next-line no-console
-        console.error('Add-reaction failed')
+        console.error('Add-eyes-reaction failed')
       })
     // Post GitHub issue comment
     const postComment = async (body: string): Promise<void> => {
@@ -142,6 +142,31 @@ async function run(): Promise<void> {
           await executeShebangScript(token.text)
         }
       }
+    }
+    if (reactionRes !== undefined) {
+      // Add +1 reaction
+      await githubClient.reactions
+        .createForIssueComment({
+          // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
+          comment_id: (context.payload as any).comment.id,
+          content: '+1',
+          owner: context.repo.owner,
+          repo: context.repo.repo
+        })
+        .catch(err => {
+          // eslint-disable-next-line no-console
+          console.error('Add-+1-reaction failed')
+        })
+      // Delete eyes reaction
+      await githubClient.reactions
+        .delete({
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          reaction_id: reactionRes.data.id
+        })
+        .catch(err => {
+          // eslint-disable-next-line no-console
+          console.error('Delete-reaction failed')
+        })
     }
   } catch (error) {
     core.setFailed(error.message)
