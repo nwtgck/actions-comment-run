@@ -17,9 +17,9 @@ const commentAuthorAssociationsType = t.array(t.string)
 
 const commentPrefix = '@github-actions run'
 
-type MethodAndBody =
-  | {method: 'GET'; body: undefined}
-  | {method: 'POST'; body: nodeFetch.BodyInit}
+type GithubApiOption =
+  | {method: 'GET'; headers: {[key: string]: string}; body: undefined}
+  | {method: 'POST'; headers: {[key: string]: string}; body: nodeFetch.BodyInit}
 
 async function run(): Promise<void> {
   try {
@@ -39,19 +39,18 @@ async function run(): Promise<void> {
     }
     const callGithubApi = async (
       url: string,
-      option?: MethodAndBody
+      option?: GithubApiOption
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<any> => {
       return fetch(url, {
-        headers: [
-          [
-            'Authorization',
-            `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString(
-              'base64'
-            )}`
-          ]
-        ],
-        ...option
+        headers: {
+          Authorization: `Basic ${Buffer.from(
+            `${context.actor}:${githubToken}`
+          ).toString('base64')}`,
+          ...option?.headers
+        },
+        method: option?.method,
+        body: option?.body
       })
     }
     const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`

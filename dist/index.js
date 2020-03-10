@@ -4382,12 +4382,12 @@ function run() {
             const callGithubApi = (url, option
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ) => __awaiter(this, void 0, void 0, function* () {
-                return fetch(url, Object.assign({ headers: [
-                        [
-                            'Authorization',
-                            `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString('base64')}`
-                        ]
-                    ] }, option));
+                var _a, _b, _c;
+                return fetch(url, {
+                    headers: Object.assign({ Authorization: `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString('base64')}` }, (_a = option) === null || _a === void 0 ? void 0 : _a.headers),
+                    method: (_b = option) === null || _b === void 0 ? void 0 : _b.method,
+                    body: (_c = option) === null || _c === void 0 ? void 0 : _c.body
+                });
             });
             const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`;
             const permissionRes = yield callGithubApi(permissionUrl);
