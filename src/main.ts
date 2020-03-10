@@ -6,7 +6,7 @@ import {
   GitHub as actionsGitHub
 } from '@actions/github'
 import * as exec from '@actions/exec'
-import nodeFetch from 'node-fetch'
+import * as nodeFetch from 'node-fetch'
 import {execSync as childProcessExecSync, spawn} from 'child_process'
 import * as marked from 'marked'
 import * as t from 'io-ts'
@@ -17,6 +17,10 @@ const commentAuthorAssociationsType = t.array(t.string)
 
 const commentPrefix = '@github-actions run'
 
+type MethodAndBody =
+  | {method: 'GET'; body: undefined}
+  | {method: 'POST'; body: nodeFetch.BodyInit}
+
 async function run(): Promise<void> {
   try {
     // Avoid mangling
@@ -24,7 +28,7 @@ async function run(): Promise<void> {
     // Avoid mangling
     const GitHub = actionsGitHub
     // Avoid mangling
-    const fetch = nodeFetch
+    const fetch = nodeFetch.default
     // Avoid mangling
     const execSync = childProcessExecSync
     const githubToken = core.getInput('github-token', {required: true})
@@ -33,8 +37,11 @@ async function run(): Promise<void> {
       console.warn(`event name is not 'issue_comment': ${context.eventName}`)
       return
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const callGithubApi = async (url: string): Promise<any> => {
+    const callGithubApi = async (
+      url: string,
+      option?: MethodAndBody
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): Promise<any> => {
       return fetch(url, {
         headers: [
           [
@@ -43,7 +50,8 @@ async function run(): Promise<void> {
               'base64'
             )}`
           ]
-        ]
+        ],
+        ...option
       })
     }
     const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`

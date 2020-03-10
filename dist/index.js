@@ -4350,14 +4350,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 const exec = __importStar(__webpack_require__(986));
-const node_fetch_1 = __importDefault(__webpack_require__(454));
+const nodeFetch = __importStar(__webpack_require__(454));
 const child_process_1 = __webpack_require__(129);
 const marked = __importStar(__webpack_require__(886));
 const t = __importStar(__webpack_require__(338));
@@ -4373,7 +4370,7 @@ function run() {
             // Avoid mangling
             const GitHub = github_1.GitHub;
             // Avoid mangling
-            const fetch = node_fetch_1.default;
+            const fetch = nodeFetch.default;
             // Avoid mangling
             const execSync = child_process_1.execSync;
             const githubToken = core.getInput('github-token', { required: true });
@@ -4382,16 +4379,15 @@ function run() {
                 console.warn(`event name is not 'issue_comment': ${context.eventName}`);
                 return;
             }
+            const callGithubApi = (url, option
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const callGithubApi = (url) => __awaiter(this, void 0, void 0, function* () {
-                return fetch(url, {
-                    headers: [
+            ) => __awaiter(this, void 0, void 0, function* () {
+                return fetch(url, Object.assign({ headers: [
                         [
                             'Authorization',
                             `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString('base64')}`
                         ]
-                    ]
-                });
+                    ] }, option));
             });
             const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`;
             const permissionRes = yield callGithubApi(permissionUrl);
