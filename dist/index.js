@@ -4382,6 +4382,26 @@ function run() {
                 console.warn(`event name is not 'issue_comment': ${context.eventName}`);
                 return;
             }
+            const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`;
+            const permissionRes = yield fetch(permissionUrl, {
+                headers: [
+                    [
+                        'Authorization',
+                        `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString('base64')}`
+                    ]
+                ]
+            });
+            if (permissionRes.status !== 200) {
+                // eslint-disable-next-line no-console
+                console.error(`Permission check returns non-200 status: ${permissionRes.status}`);
+                return;
+            }
+            const permissionJson = yield permissionRes.json();
+            if (!['admin', 'write'].includes(permissionJson.permission)) {
+                // eslint-disable-next-line no-console
+                console.error(`ERROR: ${context.actor} does not have admin/write permission: ${permissionJson.permission}`);
+                return;
+            }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const comment = context.payload.comment.body;
             // If not command-run-request comment
