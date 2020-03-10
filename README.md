@@ -64,6 +64,33 @@ Here are examples.
 
 Learn more: [CommentAuthorAssociation | GitHub Developer Guide](https://developer.github.com/v4/enum/commentauthorassociation/)
 
+## Available variables in the js-comment-context
+
+Here are available variables and functions in the ```` ```js  ```` code block.
+
+| variable       | examples                                                                   | type or reference                                                                 |
+|----------------|----------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| `context`      | `context.repo.owner`, `context.payload.comment`                            | [toolkit/context.ts at @actions/github@1.1.0 · actions/toolkit]                    |
+| `githubToken`  | `new GitHub(githubToken)`                                                  |                                                                                    |
+| `githubClient` | `await githubClient.pulls.create(...)`,  `await githubClient.graphql(...)` | [toolkit/packages/github at master · actions/toolkit]                              |
+| `execSync`     | `execSync("ls -l")`                                                        | [child_process.execSync()]                                                         |
+| `postComment`  | `await postComment("**hey!**")`                                            | `(markdown: string) => Promise<void>`, post GitHub issue/pull request comment      |
+| `GitHub`       | `new GitHub(githubToken)`                                                  | [toolkit/packages/github at master · actions/toolkit]                              |
+| `fetch`        | `await fetch("https://example.com")`                                       | [node-fetch/node-fetch: A light-weight module that brings window.fetch to Node.js] |
+| `core`         | `core.debug('my message')`                                                 | [toolkit/packages/core at master · actions/toolkit]                                |
+| `exec`         | `exec.exec("git status")`                                                  | [toolkit/packages/exec at master · actions/toolkit]                                |
+
+Other built-in variables and functions in Node.js such as `process` and `require(...)` are also available. This means you can use `process.env` for environment variables and `require('fs')` for file access.
+
+Although other variables not in the list can be used on the comment, comment-run guarantees use of the variables list above and non-listed variables are not guaranteed to use.
+
+[toolkit/context.ts at @actions/github@1.1.0 · actions/toolkit]: https://github.com/actions/toolkit/blob/a2ab4bcf78e4f7080f0d45856e6eeba16f0bbc52/packages/github/src/context.ts
+[toolkit/packages/github at master · actions/toolkit]: https://github.com/actions/toolkit/tree/master/packages/github#usage
+[child_process.execSync()]: https://nodejs.org/api/child_process.html#child_process_child_process_execsync_command_options
+[node-fetch/node-fetch: A light-weight module that brings window.fetch to Node.js]: https://github.com/node-fetch/node-fetch#common-usage
+[toolkit/packages/core at master · actions/toolkit]: https://github.com/actions/toolkit/tree/master/packages/core
+[toolkit/packages/exec at master · actions/toolkit]: https://github.com/actions/toolkit/tree/master/packages/exec
+
 ## Useful examples
 
 ### LGTM Image
