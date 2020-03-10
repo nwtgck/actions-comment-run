@@ -6,7 +6,7 @@ import {
   GitHub as actionsGitHub
 } from '@actions/github'
 import * as exec from '@actions/exec'
-import nodeFetch from 'node-fetch'
+import * as nodeFetch from 'node-fetch'
 import {execSync as childProcessExecSync, spawn} from 'child_process'
 import * as marked from 'marked'
 import * as t from 'io-ts'
@@ -17,6 +17,10 @@ const commentAuthorAssociationsType = t.array(t.string)
 
 const commentPrefix = '@github-actions run'
 
+type GithubApiOption =
+  | {method: 'GET'; headers: {[key: string]: string}; body: undefined}
+  | {method: 'POST'; headers: {[key: string]: string}; body: nodeFetch.BodyInit}
+
 async function run(): Promise<void> {
   try {
     // Avoid mangling
@@ -24,74 +28,120 @@ async function run(): Promise<void> {
     // Avoid mangling
     const GitHub = actionsGitHub
     // Avoid mangling
-    const fetch = nodeFetch
+    const fetch = nodeFetch.default
     // Avoid mangling
     const execSync = childProcessExecSync
     const githubToken = core.getInput('github-token', {required: true})
-    if (context.eventName === 'issue_comment') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const comment: string = (context.payload as any).comment.body
-      // If not command-run-request comment
-      if (!comment.startsWith(commentPrefix)) {
-        // eslint-disable-next-line no-console
-        console.log(
-          `HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`
-        )
-        return
-      }
-      // Get allowed associations
-      const allowedAssociationsStr = core.getInput('allowed-associations')
-      // Parse and validate
-      const allowedAssociationsEither = commentAuthorAssociationsType.decode(
-        JSON.parse(allowedAssociationsStr)
-      )
-      if (!isRight(allowedAssociationsEither)) {
-        // eslint-disable-next-line no-console
-        console.error(
-          `ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`
-        )
-        return
-      }
-      const allowedAssociations: string[] = allowedAssociationsEither.right
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const association = (context.payload as any).comment.author_association
-      // If commenting user is not allowed to run scripts
-      if (!allowedAssociations.includes(association)) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`
-        )
-        return
-      }
-      // Create GitHub client which can be used in the user script
-      const githubClient = new GitHub(githubToken)
-      // Post GitHub issue comment
-      const postComment = async (body: string): Promise<void> => {
-        await githubClient.issues.createComment({
-          // eslint-disable-next-line @typescript-eslint/camelcase
-          issue_number: context.issue.number,
-          owner: context.repo.owner,
-          repo: context.repo.repo,
-          body
-        })
-      }
-      // Parse the comment
-      const tokens = marked.lexer(comment)
-      for (const token of tokens) {
-        if (token.type === 'code') {
-          if (token.lang === 'js' || token.lang === 'javascript') {
-            // Eval JavaScript
-            // NOTE: Eval result can be promise
-            await eval(token.text)
-          } else if (token.text.startsWith('#!')) {
-            // Execute script with shebang
-            await executeShebangScript(token.text)
-          }
-        }
-      }
-    } else {
+    if (context.eventName !== 'issue_comment') {
       // eslint-disable-next-line no-console
       console.warn(`event name is not 'issue_comment': ${context.eventName}`)
+      return
+    }
+    const callGithubApi = async (
+      url: string,
+      option?: GithubApiOption
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): Promise<any> => {
+      return fetch(url, {
+        headers: {
+          Authorization: `Basic ${Buffer.from(
+            `${context.actor}:${githubToken}`
+          ).toString('base64')}`,
+          ...option?.headers
+        },
+        method: option?.method,
+        body: option?.body
+      })
+    }
+    const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`
+    const permissionRes = await callGithubApi(permissionUrl)
+    if (permissionRes.status !== 200) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `Permission check returns non-200 status: ${permissionRes.status}`
+      )
+      return
+    }
+    const permissionJson = await permissionRes.json()
+    if (!['admin', 'write'].includes(permissionJson.permission)) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `ERROR: ${context.actor} does not have admin/write permission: ${permissionJson.permission}`
+      )
+      return
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const comment: string = (context.payload as any).comment.body
+    // If not command-run-request comment
+    if (!comment.startsWith(commentPrefix)) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`
+      )
+      return
+    }
+    // Get allowed associations
+    const allowedAssociationsStr = core.getInput('allowed-associations')
+    // Parse and validate
+    const allowedAssociationsEither = commentAuthorAssociationsType.decode(
+      JSON.parse(allowedAssociationsStr)
+    )
+    if (!isRight(allowedAssociationsEither)) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`
+      )
+      return
+    }
+    const allowedAssociations: string[] = allowedAssociationsEither.right
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const association = (context.payload as any).comment.author_association
+    // If commenting user is not allowed to run scripts
+    if (!allowedAssociations.includes(association)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`
+      )
+      return
+    }
+    // Create GitHub client which can be used in the user script
+    const githubClient = new GitHub(githubToken)
+    // Add reaction
+    await githubClient.reactions
+      .createForIssueComment({
+        // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
+        comment_id: (context.payload as any).comment.id,
+        content: '+1',
+        owner: context.repo.owner,
+        repo: context.repo.repo
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.error('Add-reaction failed')
+      })
+    // Post GitHub issue comment
+    const postComment = async (body: string): Promise<void> => {
+      await githubClient.issues.createComment({
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        issue_number: context.issue.number,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        body
+      })
+    }
+    // Parse the comment
+    const tokens = marked.lexer(comment)
+    for (const token of tokens) {
+      if (token.type === 'code') {
+        if (token.lang === 'js' || token.lang === 'javascript') {
+          // Eval JavaScript
+          // NOTE: Eval result can be promise
+          await eval(token.text)
+        } else if (token.text.startsWith('#!')) {
+          // Execute script with shebang
+          await executeShebangScript(token.text)
+        }
+      }
     }
   } catch (error) {
     core.setFailed(error.message)

@@ -51,6 +51,19 @@ mkdir -p .github/workflows/ && cd .github/workflows/ && wget https://gist.github
 ```
 After introducing this, create new issue or pull request and post `@github-actions run` comment.
 
+## Comment author who can run scripts
+
+Only accounts who have admin or write permission can execute the comment on your repository. (ref: [Collaborators | GitHub Developer Guide](https://developer.github.com/v3/repos/collaborators/#review-a-users-permission-level))
+
+By default, only owner can execute the scripts. You can change `allowed-associations: '["OWNER"]'` in the yaml above.
+
+Here are examples.
+- `allowed-associations: '["OWNER"]'`
+- `allowed-associations: '["OWNER", "MEMBER"]'`
+- `allowed-associations: '["OWNER", "COLLABORATOR"]'`
+
+Learn more: [CommentAuthorAssociation | GitHub Developer Guide](https://developer.github.com/v4/enum/commentauthorassociation/)
+
 ## Useful examples
 
 ### LGTM Image
@@ -296,7 +309,7 @@ Here are examples.
 - Haskell: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596176131>
 - Scala: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596180626>
 
-## TIPS: Use existing package, TypeScript and mange on GitHub
+## TIPS: Use existing package, TypeScript and manage on GitHub
 
 When your comment-run scripts are matured, you might  want to use TypeScript for maintainability.
 The following repository uses existing npm packages and TypeScript.  
