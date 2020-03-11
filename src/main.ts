@@ -7,7 +7,7 @@ import {
 } from '@actions/github'
 import * as exec from '@actions/exec'
 import * as nodeFetch from 'node-fetch'
-import {execSync as childProcessExecSync, spawn} from 'child_process'
+import {execSync as childProcessExecSync} from 'child_process'
 import * as marked from 'marked'
 import * as t from 'io-ts'
 import {isRight} from 'fp-ts/lib/Either'
