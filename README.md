@@ -316,7 +316,7 @@ Reactions on comments represent the Action is working. Here is a list of the rea
 |Reaction|Reason|
 |-|-|
 |👀|The Action has started looking at your comment.|
-|👍🏾|The Action has completed.|
+|👍|The Action has completed.|
 
 ## TIPS: Run other languages
 
