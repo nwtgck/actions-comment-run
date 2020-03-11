@@ -2889,26 +2889,22 @@ function run() {
                 console.warn(`event name is not 'issue_comment': ${context.eventName}`);
                 return;
             }
-            const callGithubApi = (url, option
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ) => __awaiter(this, void 0, void 0, function* () {
-                return fetch(url, {
-                    headers: Object.assign({ Authorization: `Basic ${Buffer.from(`${context.actor}:${githubToken}`).toString('base64')}` }, option === null || option === void 0 ? void 0 : option.headers),
-                    method: option === null || option === void 0 ? void 0 : option.method,
-                    body: option === null || option === void 0 ? void 0 : option.body
-                });
+            // Create GitHub client which can be used in the user script
+            const githubClient = new GitHub(githubToken);
+            const permissionRes = yield githubClient.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: context.actor
             });
-            const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`;
-            const permissionRes = yield callGithubApi(permissionUrl);
             if (permissionRes.status !== 200) {
                 // eslint-disable-next-line no-console
                 console.error(`Permission check returns non-200 status: ${permissionRes.status}`);
                 return;
             }
-            const permissionJson = yield permissionRes.json();
-            if (!['admin', 'write'].includes(permissionJson.permission)) {
+            const actorPermission = permissionRes.data.permission;
+            if (!['admin', 'write'].includes(actorPermission)) {
                 // eslint-disable-next-line no-console
-                console.error(`ERROR: ${context.actor} does not have admin/write permission: ${permissionJson.permission}`);
+                console.error(`ERROR: ${context.actor} does not have admin/write permission: ${actorPermission}`);
                 return;
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2937,8 +2933,6 @@ function run() {
                 console.warn(`NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`);
                 return;
             }
-            // Create GitHub client which can be used in the user script
-            const githubClient = new GitHub(githubToken);
             // Add :eyes: reaction
             const reactionRes = yield githubClient.reactions
                 .createForIssueComment({
