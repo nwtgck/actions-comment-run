@@ -309,6 +309,14 @@ Thanks Cryolite!
 You can save "Saved replies" as follows.  
 Avatar icon > Settings > Saved replies
 
+## TIPS: Reactions
+
+Reactions on comments represent the Action is working. Here is a list of the reactions and descriptions. 
+
+|Reaction|Reason|
+|-|-|
+|👀|The Action has started looking at your comment.|
+|👍|The Action has completed.|
 
 ## TIPS: Run other languages
 
