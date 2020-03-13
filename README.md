@@ -1,5 +1,5 @@
 # actions-comment-run
-Execute comment from issues and pull requests
+Execute any script in a GitHub issue comment
 
 ## Say "hello, world"
 

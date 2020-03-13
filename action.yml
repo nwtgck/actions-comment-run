@@ -1,5 +1,5 @@
 name: 'Comment Run Actions'
-description: 'Execute comment from issues and pull requests'
+description: 'Execute any script in a GitHub issue comment'
 author: 'Ryo Ota <nwtgck@nwtgck.org>'
 inputs:
   github-token:
