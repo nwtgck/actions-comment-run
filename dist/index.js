@@ -934,11 +934,11 @@ module.exports = class InlineLexer {
         }
 
         src = src.substring(cap[0].length);
-        out += this.options.sanitize
-          ? this.options.sanitizer
+        out += this.renderer.html(this.options.sanitize
+          ? (this.options.sanitizer
             ? this.options.sanitizer(cap[0])
-            : escape(cap[0])
-          : cap[0];
+            : escape(cap[0]))
+          : cap[0]);
         continue;
       }
 
@@ -3332,7 +3332,7 @@ const {
 const block = {
   newline: /^\n+/,
   code: /^( {4}[^\n]+\n*)+/,
-  fences: /^ {0,3}(`{3,}|~{3,})([^`~\n]*)\n(?:|([\s\S]*?)\n)(?: {0,3}\1[~`]* *(?:\n+|$)|$)/,
+  fences: /^ {0,3}(`{3,}(?=[^`\n]*\n)|~{3,})([^\n]*)\n(?:|([\s\S]*?)\n)(?: {0,3}\1[~`]* *(?:\n+|$)|$)/,
   hr: /^ {0,3}((?:- *){3,}|(?:_ *){3,}|(?:\* *){3,})(?:\n+|$)/,
   heading: /^ {0,3}(#{1,6}) +([^\n]*?)(?: +#+)? *(?:\n+|$)/,
   blockquote: /^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/,
@@ -3391,10 +3391,10 @@ block.html = edit(block.html, 'i')
 
 block.paragraph = edit(block._paragraph)
   .replace('hr', block.hr)
-  .replace('heading', ' {0,3}#{1,6} +')
+  .replace('heading', ' {0,3}#{1,6} ')
   .replace('|lheading', '') // setex headings don't interrupt commonmark paragraphs
   .replace('blockquote', ' {0,3}>')
-  .replace('fences', ' {0,3}(?:`{3,}|~{3,})[^`\\n]*\\n')
+  .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
   .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
   .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|!--)')
   .replace('tag', block._tag) // pars can be interrupted by type (6) html blocks
@@ -3415,9 +3415,35 @@ block.normal = merge({}, block);
  */
 
 block.gfm = merge({}, block.normal, {
-  nptable: /^ *([^|\n ].*\|.*)\n *([-:]+ *\|[-| :]*)(?:\n((?:.*[^>\n ].*(?:\n|$))*)\n*|$)/,
-  table: /^ *\|(.+)\n *\|?( *[-:]+[-| :]*)(?:\n((?: *[^>\n ].*(?:\n|$))*)\n*|$)/
+  nptable: '^ *([^|\\n ].*\\|.*)\\n' // Header
+    + ' *([-:]+ *\\|[-| :]*)' // Align
+    + '(?:\\n((?:(?!\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)', // Cells
+  table: '^ *\\|(.+)\\n' // Header
+    + ' *\\|?( *[-:]+[-| :]*)' // Align
+    + '(?:\\n *((?:(?!\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)' // Cells
 });
+
+block.gfm.nptable = edit(block.gfm.nptable)
+  .replace('hr', block.hr)
+  .replace('heading', ' {0,3}#{1,6} ')
+  .replace('blockquote', ' {0,3}>')
+  .replace('code', ' {4}[^\\n]')
+  .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
+  .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
+  .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|!--)')
+  .replace('tag', block._tag) // tables can be interrupted by type (6) html blocks
+  .getRegex();
+
+block.gfm.table = edit(block.gfm.table)
+  .replace('hr', block.hr)
+  .replace('heading', ' {0,3}#{1,6} ')
+  .replace('blockquote', ' {0,3}>')
+  .replace('code', ' {4}[^\\n]')
+  .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
+  .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
+  .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|!--)')
+  .replace('tag', block._tag) // tables can be interrupted by type (6) html blocks
+  .getRegex();
 
 /**
  * Pedantic grammar (original John Gruber's loose markdown specification)
