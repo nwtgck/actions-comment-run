@@ -39,7 +39,7 @@ jobs:
       with:
         # 0 indicates all history
         fetch-depth: 0
-    - uses: nwtgck/actions-comment-run@v1.0
+    - uses: nwtgck/actions-comment-run@v1.1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         allowed-associations: '["OWNER"]'
@@ -106,15 +106,13 @@ Post random LGTM image with [LGTM.in/g](https://lgtm.in/).
 <summary>LGTM 👍 </summary>
 
 ```js
-(async () => {
-  const res = await fetch("https://lgtm.in/g", {
-    redirect: 'manual'
-  });
-  const webSiteUrl = res.headers.get('location');
-  const picUrl = new URL(webSiteUrl);
-  picUrl.pathname = picUrl.pathname.replace("/i/", "/p/");
-  postComment(`![LGTM](${picUrl.href})`);
-})();
+const res = await fetch("https://lgtm.in/g", {
+  redirect: 'manual'
+});
+const webSiteUrl = res.headers.get('location');
+const picUrl = new URL(webSiteUrl);
+picUrl.pathname = picUrl.pathname.replace("/i/", "/p/");
+postComment(`![LGTM](${picUrl.href})`);
 ```
 </details>
 ````
@@ -156,16 +154,14 @@ exec("git add package*json");
 exec(`git commit -m "chore(deps): update npm dependencies"`);
 exec(`git push -fu origin ${prBranchName}`);
 
-(async () => {
-  await githubClient.pulls.create({
-    base: baseBranchName,
-    head: prBranchName,
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    title: "chore(deps): update npm dependencies",
-    body: "update npm dependencies",
-  });
-})();
+await githubClient.pulls.create({
+  base: baseBranchName,
+  head: prBranchName,
+  owner: context.repo.owner,
+  repo: context.repo.repo,
+  title: "chore(deps): update npm dependencies",
+  body: "update npm dependencies",
+});
 ```
 ````
 
@@ -184,39 +180,37 @@ GitHub Actions do not pass `secrets` to pull request from forked repositories. T
 <summary>🚀 Merge preview</summary>
 
 ```js
-(async () => {
-  // Get pull-req URL like "https://api.github.com/repos/nwtgck/actions-merge-preview/pulls/4"
-  const pullReqUrl = context.payload.issue.pull_request.url;
-  const githubUser = context.payload.repository.owner.login;
-  const res = await fetch(pullReqUrl, {
-    headers: [
-      ['Authorization', `Basic ${Buffer.from(`${githubUser}:${githubToken}`).toString('base64')}`]
-    ]
-  });
-  const resJson = await res.json();
-  const prUserName = resJson.head.user.login;
-  const baseBranchName = resJson.base.ref;
-  const branchName = resJson.head.ref;
-  const fullRepoName = resJson.head.repo.full_name;
-  const previewBranchName = `actions-merge-preview/${prUserName}-${branchName}`;
-  execSync(`git config --global user.email "github-actions[bot]@users.noreply.github.com"`);
-  execSync(`git config --global user.name "github-actions[bot]"`);
-  // (from: https://stackoverflow.com/a/23987039/2885946)
-  execSync(`git fetch --all`);
-  console.log(execSync(`git checkout ${baseBranchName}`).toString());
-  console.log(execSync(`git checkout -b ${previewBranchName} ${baseBranchName}`).toString());
-  console.log(execSync(`git pull https://github.com/${fullRepoName}.git ${branchName}`).toString());
-  // Push preview branch
-  // NOTE: Force push (should be safe because preview branch always start with "actions-merge-preview/")
-  execSync(`git push -fu origin ${previewBranchName}`);
-  const baseRepoFullName = context.payload.repository.full_name;
-  // Create GitHub client
-  const githubClient = new GitHub(githubToken);
-  // Comment body
-  const commentBody = `🚀 Preview branch:  \n<https://github.com/${baseRepoFullName}/tree/${previewBranchName}>`;
-  // Comment the deploy URL
-  await postComment(commentBody);
-})();
+// Get pull-req URL like "https://api.github.com/repos/nwtgck/actions-merge-preview/pulls/4"
+const pullReqUrl = context.payload.issue.pull_request.url;
+const githubUser = context.payload.repository.owner.login;
+const res = await fetch(pullReqUrl, {
+  headers: [
+    ['Authorization', `Basic ${Buffer.from(`${githubUser}:${githubToken}`).toString('base64')}`]
+  ]
+});
+const resJson = await res.json();
+const prUserName = resJson.head.user.login;
+const baseBranchName = resJson.base.ref;
+const branchName = resJson.head.ref;
+const fullRepoName = resJson.head.repo.full_name;
+const previewBranchName = `actions-merge-preview/${prUserName}-${branchName}`;
+execSync(`git config --global user.email "github-actions[bot]@users.noreply.github.com"`);
+execSync(`git config --global user.name "github-actions[bot]"`);
+// (from: https://stackoverflow.com/a/23987039/2885946)
+execSync(`git fetch --all`);
+console.log(execSync(`git checkout ${baseBranchName}`).toString());
+console.log(execSync(`git checkout -b ${previewBranchName} ${baseBranchName}`).toString());
+console.log(execSync(`git pull https://github.com/${fullRepoName}.git ${branchName}`).toString());
+// Push preview branch
+// NOTE: Force push (should be safe because preview branch always start with "actions-merge-preview/")
+execSync(`git push -fu origin ${previewBranchName}`);
+const baseRepoFullName = context.payload.repository.full_name;
+// Create GitHub client
+const githubClient = new GitHub(githubToken);
+// Comment body
+const commentBody = `🚀 Preview branch:  \n<https://github.com/${baseRepoFullName}/tree/${previewBranchName}>`;
+// Comment the deploy URL
+await postComment(commentBody);
 ```
 </details>
 ````
@@ -235,12 +229,11 @@ This comment allows you to go inside of GitHub Actions environment.
 <summary>🌐 SSH debug over Piping Server</summary>
 
 ```js
-(async () => {
-  const pathLen = 64;
-  const aPath = randomString(pathLen);
-  const bPath = randomString(pathLen);
+const pathLen = 64;
+const aPath = randomString(pathLen);
+const bPath = randomString(pathLen);
 
-  console.log(execSync(`
+console.log(execSync(`
 chmod 755 "$HOME"
 ls -lA /home
 authorized_keys_file="$(sshd -T 2>/dev/null | grep -E '^authorizedkeysfile ' | cut -d ' ' -f 2)"
@@ -255,8 +248,8 @@ echo $authorized_keys_file;
 sudo apt install -y socat;
 `).toString());
 
-    // Comment new session
-    const commentBody = `\
+// Comment new session
+const commentBody = `\
 ## 🌐 New SSH session
 Run the commands below in different terminals.
 
@@ -270,15 +263,14 @@ ssh -p 31376 runner@localhost
 \`\`\`
 
 `;
-  await githubClient.issues.createComment({
-    issue_number: context.issue.number,
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    body: commentBody
-  });
+await githubClient.issues.createComment({
+  issue_number: context.issue.number,
+  owner: context.repo.owner,
+  repo: context.repo.repo,
+  body: commentBody
+});
 
-  execSync(`socat 'EXEC:curl -NsS https\\://ppng.io/${aPath}!!EXEC:curl -NsST - https\\://ppng.io/${bPath}' TCP:127.0.0.1:22`);
-})();
+execSync(`socat 'EXEC:curl -NsS https\\://ppng.io/${aPath}!!EXEC:curl -NsST - https\\://ppng.io/${bPath}' TCP:127.0.0.1:22`);
 
 // (from: https://stackoverflow.com/a/1349426/2885946)
 function randomString(length) {
