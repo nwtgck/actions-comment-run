@@ -1,17 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import * as core from '@actions/core'
-import {
-  context as githubContext,
-  GitHub as actionsGitHub
-} from '@actions/github'
+import {context, GitHub} from '@actions/github'
 import * as exec from '@actions/exec'
-import * as nodeFetch from 'node-fetch'
-import {execSync as childProcessExecSync} from 'child_process'
+import fetch from 'node-fetch'
+import {execSync} from 'child_process'
 import * as marked from 'marked'
 import * as t from 'io-ts'
 import {isRight} from 'fp-ts/lib/Either'
 import * as fs from 'fs'
+
+import {callAsyncFunction} from './async-function'
 
 const commentAuthorAssociationsType = t.array(t.string)
 
@@ -19,14 +18,6 @@ const commentPrefix = '@github-actions run'
 
 async function run(): Promise<void> {
   try {
-    // Avoid mangling
-    const context = githubContext
-    // Avoid mangling
-    const GitHub = actionsGitHub
-    // Avoid mangling
-    const fetch = nodeFetch.default
-    // Avoid mangling
-    const execSync = childProcessExecSync
     const githubToken = core.getInput('github-token', {required: true})
     if (context.eventName !== 'issue_comment') {
       // eslint-disable-next-line no-console
@@ -120,8 +111,20 @@ async function run(): Promise<void> {
       if (token.type === 'code') {
         if (token.lang === 'js' || token.lang === 'javascript') {
           // Eval JavaScript
-          // NOTE: Eval result can be promise
-          await eval(token.text)
+          await callAsyncFunction(
+            {
+              core,
+              exec,
+              fetch,
+              context,
+              GitHub,
+              githubToken,
+              githubClient,
+              execSync,
+              postComment
+            },
+            token.text
+          )
         } else if (token.text.startsWith('#!')) {
           // Execute script with shebang
           await executeShebangScript(token.text)

@@ -2847,15 +2847,6 @@ function checkMode (stat, options) {
 "use strict";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -2863,147 +2854,150 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 const exec = __importStar(__webpack_require__(986));
-const nodeFetch = __importStar(__webpack_require__(454));
+const node_fetch_1 = __importDefault(__webpack_require__(454));
 const child_process_1 = __webpack_require__(129);
 const marked = __importStar(__webpack_require__(886));
 const t = __importStar(__webpack_require__(338));
 const Either_1 = __webpack_require__(311);
 const fs = __importStar(__webpack_require__(747));
+const async_function_1 = __webpack_require__(392);
 const commentAuthorAssociationsType = t.array(t.string);
 const commentPrefix = '@github-actions run';
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            // Avoid mangling
-            const context = github_1.context;
-            // Avoid mangling
-            const GitHub = github_1.GitHub;
-            // Avoid mangling
-            const fetch = nodeFetch.default;
-            // Avoid mangling
-            const execSync = child_process_1.execSync;
-            const githubToken = core.getInput('github-token', { required: true });
-            if (context.eventName !== 'issue_comment') {
-                // eslint-disable-next-line no-console
-                console.warn(`event name is not 'issue_comment': ${context.eventName}`);
-                return;
-            }
-            // Create GitHub client which can be used in the user script
-            const githubClient = new GitHub(githubToken);
-            const permissionRes = yield githubClient.repos.getCollaboratorPermissionLevel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                username: context.actor
+async function run() {
+    try {
+        const githubToken = core.getInput('github-token', { required: true });
+        if (github_1.context.eventName !== 'issue_comment') {
+            // eslint-disable-next-line no-console
+            console.warn(`event name is not 'issue_comment': ${github_1.context.eventName}`);
+            return;
+        }
+        // Create GitHub client which can be used in the user script
+        const githubClient = new github_1.GitHub(githubToken);
+        const permissionRes = await githubClient.repos.getCollaboratorPermissionLevel({
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo,
+            username: github_1.context.actor
+        });
+        if (permissionRes.status !== 200) {
+            // eslint-disable-next-line no-console
+            console.error(`Permission check returns non-200 status: ${permissionRes.status}`);
+            return;
+        }
+        const actorPermission = permissionRes.data.permission;
+        if (!['admin', 'write'].includes(actorPermission)) {
+            // eslint-disable-next-line no-console
+            console.error(`ERROR: ${github_1.context.actor} does not have admin/write permission: ${actorPermission}`);
+            return;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const comment = github_1.context.payload.comment.body;
+        // If not command-run-request comment
+        if (!comment.startsWith(commentPrefix)) {
+            // eslint-disable-next-line no-console
+            console.log(`HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`);
+            return;
+        }
+        // Get allowed associations
+        const allowedAssociationsStr = core.getInput('allowed-associations');
+        // Parse and validate
+        const allowedAssociationsEither = commentAuthorAssociationsType.decode(JSON.parse(allowedAssociationsStr));
+        if (!Either_1.isRight(allowedAssociationsEither)) {
+            // eslint-disable-next-line no-console
+            console.error(`ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`);
+            return;
+        }
+        const allowedAssociations = allowedAssociationsEither.right;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const association = github_1.context.payload.comment.author_association;
+        // If commenting user is not allowed to run scripts
+        if (!allowedAssociations.includes(association)) {
+            // eslint-disable-next-line no-console
+            console.warn(`NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`);
+            return;
+        }
+        // Add :eyes: reaction
+        const reactionRes = await githubClient.reactions
+            .createForIssueComment({
+            // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
+            comment_id: github_1.context.payload.comment.id,
+            content: 'eyes',
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo
+        })
+            .catch(err => {
+            // eslint-disable-next-line no-console
+            console.error('Add-eyes-reaction failed');
+        });
+        // Post GitHub issue comment
+        const postComment = async (body) => {
+            await githubClient.issues.createComment({
+                // eslint-disable-next-line @typescript-eslint/camelcase
+                issue_number: github_1.context.issue.number,
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo,
+                body
             });
-            if (permissionRes.status !== 200) {
-                // eslint-disable-next-line no-console
-                console.error(`Permission check returns non-200 status: ${permissionRes.status}`);
-                return;
+        };
+        // Parse the comment
+        const tokens = marked.lexer(comment);
+        for (const token of tokens) {
+            if (token.type === 'code') {
+                if (token.lang === 'js' || token.lang === 'javascript') {
+                    // Eval JavaScript
+                    await async_function_1.callAsyncFunction({
+                        core,
+                        exec,
+                        fetch: node_fetch_1.default,
+                        context: github_1.context,
+                        GitHub: github_1.GitHub,
+                        githubToken,
+                        githubClient,
+                        execSync: child_process_1.execSync,
+                        postComment
+                    }, token.text);
+                }
+                else if (token.text.startsWith('#!')) {
+                    // Execute script with shebang
+                    await executeShebangScript(token.text);
+                }
             }
-            const actorPermission = permissionRes.data.permission;
-            if (!['admin', 'write'].includes(actorPermission)) {
-                // eslint-disable-next-line no-console
-                console.error(`ERROR: ${context.actor} does not have admin/write permission: ${actorPermission}`);
-                return;
-            }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const comment = context.payload.comment.body;
-            // If not command-run-request comment
-            if (!comment.startsWith(commentPrefix)) {
-                // eslint-disable-next-line no-console
-                console.log(`HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`);
-                return;
-            }
-            // Get allowed associations
-            const allowedAssociationsStr = core.getInput('allowed-associations');
-            // Parse and validate
-            const allowedAssociationsEither = commentAuthorAssociationsType.decode(JSON.parse(allowedAssociationsStr));
-            if (!Either_1.isRight(allowedAssociationsEither)) {
-                // eslint-disable-next-line no-console
-                console.error(`ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`);
-                return;
-            }
-            const allowedAssociations = allowedAssociationsEither.right;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const association = context.payload.comment.author_association;
-            // If commenting user is not allowed to run scripts
-            if (!allowedAssociations.includes(association)) {
-                // eslint-disable-next-line no-console
-                console.warn(`NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`);
-                return;
-            }
-            // Add :eyes: reaction
-            const reactionRes = yield githubClient.reactions
+        }
+        if (reactionRes !== undefined) {
+            // Add +1 reaction
+            await githubClient.reactions
                 .createForIssueComment({
                 // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
-                comment_id: context.payload.comment.id,
-                content: 'eyes',
-                owner: context.repo.owner,
-                repo: context.repo.repo
+                comment_id: github_1.context.payload.comment.id,
+                content: '+1',
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo
             })
                 .catch(err => {
                 // eslint-disable-next-line no-console
-                console.error('Add-eyes-reaction failed');
+                console.error('Add-+1-reaction failed');
             });
-            // Post GitHub issue comment
-            const postComment = (body) => __awaiter(this, void 0, void 0, function* () {
-                yield githubClient.issues.createComment({
-                    // eslint-disable-next-line @typescript-eslint/camelcase
-                    issue_number: context.issue.number,
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    body
-                });
+            // Delete eyes reaction
+            await githubClient.reactions
+                .delete({
+                // eslint-disable-next-line @typescript-eslint/camelcase
+                reaction_id: reactionRes.data.id
+            })
+                .catch(err => {
+                // eslint-disable-next-line no-console
+                console.error('Delete-reaction failed');
             });
-            // Parse the comment
-            const tokens = marked.lexer(comment);
-            for (const token of tokens) {
-                if (token.type === 'code') {
-                    if (token.lang === 'js' || token.lang === 'javascript') {
-                        // Eval JavaScript
-                        // NOTE: Eval result can be promise
-                        yield eval(token.text);
-                    }
-                    else if (token.text.startsWith('#!')) {
-                        // Execute script with shebang
-                        yield executeShebangScript(token.text);
-                    }
-                }
-            }
-            if (reactionRes !== undefined) {
-                // Add +1 reaction
-                yield githubClient.reactions
-                    .createForIssueComment({
-                    // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
-                    comment_id: context.payload.comment.id,
-                    content: '+1',
-                    owner: context.repo.owner,
-                    repo: context.repo.repo
-                })
-                    .catch(err => {
-                    // eslint-disable-next-line no-console
-                    console.error('Add-+1-reaction failed');
-                });
-                // Delete eyes reaction
-                yield githubClient.reactions
-                    .delete({
-                    // eslint-disable-next-line @typescript-eslint/camelcase
-                    reaction_id: reactionRes.data.id
-                })
-                    .catch(err => {
-                    // eslint-disable-next-line no-console
-                    console.error('Delete-reaction failed');
-                });
-            }
         }
-        catch (error) {
-            core.setFailed(error.message);
-        }
-    });
+    }
+    catch (error) {
+        core.setFailed(error.message);
+    }
 }
 function createTmpFileName() {
     const prefix = 'tmp_';
@@ -3025,23 +3019,21 @@ function randomString(length) {
     }
     return result;
 }
-function executeShebangScript(script) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // NOTE: Executing file in /tmp cause the error "UnhandledPromiseRejectionWarning: Error: There was an error when attempting to execute the process '/tmp/tmp-26373utihbUOauHW'. This may indicate the process failed to start. Error: spawn /tmp/tmp-26373utihbUOauHW ENOENT"
-        const fpath = createTmpFileName();
-        try {
-            fs.writeFileSync(fpath, script);
-            fs.chmodSync(fpath, 0o777);
-            yield exec.exec(`./${fpath}`, [], {
-                outStream: process.stdout,
-                errStream: process.stderr
-            });
-        }
-        finally {
-            // Remove file
-            fs.unlinkSync(fpath);
-        }
-    });
+async function executeShebangScript(script) {
+    // NOTE: Executing file in /tmp cause the error "UnhandledPromiseRejectionWarning: Error: There was an error when attempting to execute the process '/tmp/tmp-26373utihbUOauHW'. This may indicate the process failed to start. Error: spawn /tmp/tmp-26373utihbUOauHW ENOENT"
+    const fpath = createTmpFileName();
+    try {
+        fs.writeFileSync(fpath, script);
+        fs.chmodSync(fpath, 0o777);
+        await exec.exec(`./${fpath}`, [], {
+            outStream: process.stdout,
+            errStream: process.stderr
+        });
+    }
+    finally {
+        // Remove file
+        fs.unlinkSync(fpath);
+    }
 }
 run();
 
@@ -9114,6 +9106,25 @@ function readShebang(command) {
 }
 
 module.exports = readShebang;
+
+
+/***/ }),
+
+/***/ 392:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+// (from: https://github.com/actions/github-script/blob/80a5e943b446817466ff17e8b61cb80848641ed6/src/async-function.ts)
+Object.defineProperty(exports, "__esModule", { value: true });
+const AsyncFunction = Object.getPrototypeOf(async () => { }).constructor;
+async function callAsyncFunction(args, source
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+) {
+    const fn = new AsyncFunction(...Object.keys(args), source);
+    return fn(...Object.values(args));
+}
+exports.callAsyncFunction = callAsyncFunction;
 
 
 /***/ }),
