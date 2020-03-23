@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [1.1.0] - 2020-03-23
+### Changed
+* Update dependencies
+
+### Added
+* Support top-level await
+
 ## [1.0.3] - 2020-03-10
 ### Changed
 * Add eyes reaction when started and after finished successfully add +1 reaction and remove the eyes 
@@ -24,7 +31,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 ### Added
 * Execute comment
 
-[Unreleased]: https://github.com/nwtgck/actions-netlify/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/nwtgck/actions-netlify/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/nwtgck/actions-netlify/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/nwtgck/actions-netlify/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/nwtgck/actions-netlify/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/nwtgck/actions-netlify/compare/v1.0.0...v1.0.1
