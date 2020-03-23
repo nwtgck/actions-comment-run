@@ -1,60 +1,38 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import * as core from '@actions/core'
-import {
-  context as githubContext,
-  GitHub as actionsGitHub
-} from '@actions/github'
+import {context, GitHub} from '@actions/github'
 import * as exec from '@actions/exec'
-import * as nodeFetch from 'node-fetch'
-import {execSync as childProcessExecSync, spawn} from 'child_process'
+import fetch from 'node-fetch'
+import {execSync} from 'child_process'
 import * as marked from 'marked'
 import * as t from 'io-ts'
 import {isRight} from 'fp-ts/lib/Either'
 import * as fs from 'fs'
 
+import {callAsyncFunction} from './async-function'
+
 const commentAuthorAssociationsType = t.array(t.string)
 
 const commentPrefix = '@github-actions run'
 
-type GithubApiOption =
-  | {method: 'GET'; headers: {[key: string]: string}; body: undefined}
-  | {method: 'POST'; headers: {[key: string]: string}; body: nodeFetch.BodyInit}
-
 async function run(): Promise<void> {
   try {
-    // Avoid mangling
-    const context = githubContext
-    // Avoid mangling
-    const GitHub = actionsGitHub
-    // Avoid mangling
-    const fetch = nodeFetch.default
-    // Avoid mangling
-    const execSync = childProcessExecSync
     const githubToken = core.getInput('github-token', {required: true})
     if (context.eventName !== 'issue_comment') {
       // eslint-disable-next-line no-console
       console.warn(`event name is not 'issue_comment': ${context.eventName}`)
       return
     }
-    const callGithubApi = async (
-      url: string,
-      option?: GithubApiOption
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): Promise<any> => {
-      return fetch(url, {
-        headers: {
-          Authorization: `Basic ${Buffer.from(
-            `${context.actor}:${githubToken}`
-          ).toString('base64')}`,
-          ...option?.headers
-        },
-        method: option?.method,
-        body: option?.body
-      })
-    }
-    const permissionUrl = `https://api.github.com/repos/${context.repo.owner}/${context.repo.repo}/collaborators/${context.actor}/permission`
-    const permissionRes = await callGithubApi(permissionUrl)
+    // Create GitHub client which can be used in the user script
+    const githubClient = new GitHub(githubToken)
+    const permissionRes = await githubClient.repos.getCollaboratorPermissionLevel(
+      {
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        username: context.actor
+      }
+    )
     if (permissionRes.status !== 200) {
       // eslint-disable-next-line no-console
       console.error(
@@ -62,11 +40,11 @@ async function run(): Promise<void> {
       )
       return
     }
-    const permissionJson = await permissionRes.json()
-    if (!['admin', 'write'].includes(permissionJson.permission)) {
+    const actorPermission = permissionRes.data.permission
+    if (!['admin', 'write'].includes(actorPermission)) {
       // eslint-disable-next-line no-console
       console.error(
-        `ERROR: ${context.actor} does not have admin/write permission: ${permissionJson.permission}`
+        `ERROR: ${context.actor} does not have admin/write permission: ${actorPermission}`
       )
       return
     }
@@ -104,8 +82,6 @@ async function run(): Promise<void> {
       )
       return
     }
-    // Create GitHub client which can be used in the user script
-    const githubClient = new GitHub(githubToken)
     // Add :eyes: reaction
     const reactionRes = await githubClient.reactions
       .createForIssueComment({
@@ -135,8 +111,20 @@ async function run(): Promise<void> {
       if (token.type === 'code') {
         if (token.lang === 'js' || token.lang === 'javascript') {
           // Eval JavaScript
-          // NOTE: Eval result can be promise
-          await eval(token.text)
+          await callAsyncFunction(
+            {
+              core,
+              exec,
+              fetch,
+              context,
+              GitHub,
+              githubToken,
+              githubClient,
+              execSync,
+              postComment
+            },
+            token.text
+          )
         } else if (token.text.startsWith('#!')) {
           // Execute script with shebang
           await executeShebangScript(token.text)

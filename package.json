@@ -1,6 +1,6 @@
 {
   "name": "actions-comment-run",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "private": true,
   "description": "Comment run action",
   "main": "lib/main.js",
@@ -30,24 +30,24 @@
     "@actions/github": "^2.1.1",
     "fp-ts": "^2.5.3",
     "io-ts": "^2.1.2",
-    "marked": "^0.8.0",
+    "marked": "^0.8.2",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",
     "@types/marked": "^0.7.3",
-    "@types/node": "^12.12.29",
+    "@types/node": "^12.12.30",
     "@types/node-fetch": "^2.5.5",
-    "@typescript-eslint/parser": "^2.23.0",
+    "@typescript-eslint/parser": "^2.24.0",
     "@zeit/ncc": "^0.21.1",
     "eslint": "^5.16.0",
     "eslint-plugin-github": "^2.0.0",
     "eslint-plugin-jest": "^23.8.2",
-    "jest": "^24.9.0",
+    "jest": "^25.1.0",
     "jest-circus": "^25.1.0",
     "js-yaml": "^3.13.1",
-    "prettier": "^1.19.1",
-    "ts-jest": "^24.3.0",
+    "prettier": "^2.0.1",
+    "ts-jest": "^25.2.1",
     "typescript": "^3.8.3"
   }
 }
