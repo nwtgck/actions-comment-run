@@ -15,9 +15,7 @@ For shorter, you can use as follows.
 @github-actions run
 
 ```js
-(async () => {
-  await postComment("hello, world");
-})();
+await postComment("hello, world");
 ```
 ````
 
@@ -350,10 +348,8 @@ Built bundle .js files are hosted on GitHub Pages. So, your comment will be as f
 @github-actions run
 
 ```js
-(async () => {
-  const url = "https://nwtgck.github.io/comment-run-scripts/hello-world-comment.js";
-  const js = await (await fetch(url)).text();
-  eval(js);
-})();
+const url = "https://nwtgck.github.io/comment-run-scripts/hello-world-comment.js";
+const js = await (await fetch(url)).text();
+eval(js);
 ```
 ````
