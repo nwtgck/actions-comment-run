@@ -2952,6 +2952,7 @@ async function run() {
                 if (token.lang === 'js' || token.lang === 'javascript') {
                     // Eval JavaScript
                     await async_function_1.callAsyncFunction({
+                        require,
                         core,
                         exec,
                         fetch: node_fetch_1.default,

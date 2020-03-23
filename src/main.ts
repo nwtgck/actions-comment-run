@@ -113,6 +113,7 @@ async function run(): Promise<void> {
           // Eval JavaScript
           await callAsyncFunction(
             {
+              require,
               core,
               exec,
               fetch,
