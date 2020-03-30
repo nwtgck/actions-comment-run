@@ -36,7 +36,7 @@
   "devDependencies": {
     "@types/jest": "^25.1.4",
     "@types/marked": "^0.7.3",
-    "@types/node": "^12.12.32",
+    "@types/node": "^12.12.34",
     "@types/node-fetch": "^2.5.5",
     "@typescript-eslint/parser": "^2.25.0",
     "@zeit/ncc": "^0.21.1",
