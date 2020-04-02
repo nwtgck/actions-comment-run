@@ -45,7 +45,7 @@ jobs:
 
 You can introduce comment-run with the following command.
 ```bash
-mkdir -p .github/workflows/ && cd .github/workflows/ && wget https://gist.githubusercontent.com/nwtgck/a9b291f6869db42ecc3d9e30d0a0494c/raw/comment-run.yml
+mkdir -p .github/workflows && cd .github/workflows && wget https://gist.githubusercontent.com/nwtgck/a9b291f6869db42ecc3d9e30d0a0494c/raw/comment-run.yml && cd -
 ```
 After introducing this, create new issue or pull request and post `@github-actions run` comment.
 
