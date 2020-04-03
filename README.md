@@ -45,7 +45,7 @@ jobs:
 
 You can introduce comment-run with the following command.
 ```bash
-mkdir -p .github/workflows/ && cd .github/workflows/ && wget https://gist.githubusercontent.com/nwtgck/a9b291f6869db42ecc3d9e30d0a0494c/raw/comment-run.yml
+mkdir -p .github/workflows && cd .github/workflows && wget https://gist.githubusercontent.com/nwtgck/a9b291f6869db42ecc3d9e30d0a0494c/raw/comment-run.yml && cd -
 ```
 After introducing this, create new issue or pull request and post `@github-actions run` comment.
 
@@ -203,8 +203,6 @@ console.log(execSync(`git pull https://github.com/${fullRepoName}.git ${branchNa
 // NOTE: Force push (should be safe because preview branch always start with "actions-merge-preview/")
 execSync(`git push -fu origin ${previewBranchName}`);
 const baseRepoFullName = context.payload.repository.full_name;
-// Create GitHub client
-const githubClient = new GitHub(githubToken);
 // Comment body
 const commentBody = `🚀 Preview branch:  \n<https://github.com/${baseRepoFullName}/tree/${previewBranchName}>`;
 // Comment the deploy URL
