@@ -203,8 +203,6 @@ console.log(execSync(`git pull https://github.com/${fullRepoName}.git ${branchNa
 // NOTE: Force push (should be safe because preview branch always start with "actions-merge-preview/")
 execSync(`git push -fu origin ${previewBranchName}`);
 const baseRepoFullName = context.payload.repository.full_name;
-// Create GitHub client
-const githubClient = new GitHub(githubToken);
 // Comment body
 const commentBody = `🚀 Preview branch:  \n<https://github.com/${baseRepoFullName}/tree/${previewBranchName}>`;
 // Comment the deploy URL
