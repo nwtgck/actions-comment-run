@@ -1,4 +1,4 @@
-# actions-comment-run
+# comment-run
 Execute any script in a GitHub issue comment
 
 ## Say "hello, world"
