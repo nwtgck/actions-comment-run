@@ -13761,7 +13761,7 @@ var isPlainObject = _interopDefault(__webpack_require__(696));
 var nodeFetch = _interopDefault(__webpack_require__(454));
 var requestError = __webpack_require__(463);
 
-const VERSION = "5.3.4";
+const VERSION = "5.4.0";
 
 function getBufferResponse(response) {
   return response.arrayBuffer();
