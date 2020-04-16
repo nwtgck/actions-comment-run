@@ -6809,6 +6809,9 @@ var NullType = /** @class */ (function (_super) {
     __extends(NullType, _super);
     function NullType() {
         var _this = _super.call(this, 'null', function (u) { return u === null; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'NullType';
         return _this;
     }
@@ -6827,6 +6830,9 @@ var UndefinedType = /** @class */ (function (_super) {
     __extends(UndefinedType, _super);
     function UndefinedType() {
         var _this = _super.call(this, 'undefined', function (u) { return u === void 0; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'UndefinedType';
         return _this;
     }
@@ -6842,6 +6848,9 @@ var VoidType = /** @class */ (function (_super) {
     __extends(VoidType, _super);
     function VoidType() {
         var _this = _super.call(this, 'void', undefinedType.is, undefinedType.validate, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'VoidType';
         return _this;
     }
@@ -6860,6 +6869,9 @@ var UnknownType = /** @class */ (function (_super) {
     __extends(UnknownType, _super);
     function UnknownType() {
         var _this = _super.call(this, 'unknown', function (_) { return true; }, exports.success, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'UnknownType';
         return _this;
     }
@@ -6877,6 +6889,9 @@ var StringType = /** @class */ (function (_super) {
     __extends(StringType, _super);
     function StringType() {
         var _this = _super.call(this, 'string', function (u) { return typeof u === 'string'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'StringType';
         return _this;
     }
@@ -6894,6 +6909,9 @@ var NumberType = /** @class */ (function (_super) {
     __extends(NumberType, _super);
     function NumberType() {
         var _this = _super.call(this, 'number', function (u) { return typeof u === 'number'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'NumberType';
         return _this;
     }
@@ -6913,6 +6931,9 @@ var BigIntType = /** @class */ (function (_super) {
         var _this = _super.call(this, 'bigint', 
         // tslint:disable-next-line: valid-typeof
         function (u) { return typeof u === 'bigint'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'BigIntType';
         return _this;
     }
@@ -6930,6 +6951,9 @@ var BooleanType = /** @class */ (function (_super) {
     __extends(BooleanType, _super);
     function BooleanType() {
         var _this = _super.call(this, 'boolean', function (u) { return typeof u === 'boolean'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'BooleanType';
         return _this;
     }
@@ -6947,6 +6971,9 @@ var AnyArrayType = /** @class */ (function (_super) {
     __extends(AnyArrayType, _super);
     function AnyArrayType() {
         var _this = _super.call(this, 'UnknownArray', Array.isArray, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'AnyArrayType';
         return _this;
     }
@@ -6968,6 +6995,9 @@ var AnyDictionaryType = /** @class */ (function (_super) {
             var s = Object.prototype.toString.call(u);
             return s === '[object Object]' || s === '[object Window]';
         }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'AnyDictionaryType';
         return _this;
     }
@@ -6988,6 +7018,9 @@ var FunctionType = /** @class */ (function (_super) {
         var _this = _super.call(this, 'Function', 
         // tslint:disable-next-line:strict-type-predicates
         function (u) { return typeof u === 'function'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'FunctionType';
         return _this;
     }
@@ -7009,6 +7042,9 @@ var RefinementType = /** @class */ (function (_super) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.type = type;
         _this.predicate = predicate;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'RefinementType';
         return _this;
     }
@@ -7035,6 +7071,9 @@ var LiteralType = /** @class */ (function (_super) {
     function LiteralType(name, is, validate, encode, value) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.value = value;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'LiteralType';
         return _this;
     }
@@ -7057,6 +7096,9 @@ var KeyofType = /** @class */ (function (_super) {
     function KeyofType(name, is, validate, encode, keys) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.keys = keys;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'KeyofType';
         return _this;
     }
@@ -7082,6 +7124,9 @@ var RecursiveType = /** @class */ (function (_super) {
     function RecursiveType(name, is, validate, encode, runDefinition) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.runDefinition = runDefinition;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'RecursiveType';
         return _this;
     }
@@ -7118,6 +7163,9 @@ var ArrayType = /** @class */ (function (_super) {
     function ArrayType(name, is, validate, encode, type) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.type = type;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'ArrayType';
         return _this;
     }
@@ -7162,6 +7210,9 @@ var InterfaceType = /** @class */ (function (_super) {
     function InterfaceType(name, is, validate, encode, props) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.props = props;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'InterfaceType';
         return _this;
     }
@@ -7252,6 +7303,9 @@ var PartialType = /** @class */ (function (_super) {
     function PartialType(name, is, validate, encode, props) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.props = props;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'PartialType';
         return _this;
     }
@@ -7331,6 +7385,9 @@ var DictionaryType = /** @class */ (function (_super) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.domain = domain;
         _this.codomain = codomain;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'DictionaryType';
         return _this;
     }
@@ -7465,6 +7522,9 @@ var UnionType = /** @class */ (function (_super) {
     function UnionType(name, is, validate, encode, types) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.types = types;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'UnionType';
         return _this;
     }
@@ -7556,6 +7616,9 @@ var IntersectionType = /** @class */ (function (_super) {
     function IntersectionType(name, is, validate, encode, types) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.types = types;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'IntersectionType';
         return _this;
     }
@@ -7625,6 +7688,9 @@ var TupleType = /** @class */ (function (_super) {
     function TupleType(name, is, validate, encode, types) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.types = types;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'TupleType';
         return _this;
     }
@@ -7669,6 +7735,9 @@ var ReadonlyType = /** @class */ (function (_super) {
     function ReadonlyType(name, is, validate, encode, type) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.type = type;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'ReadonlyType';
         return _this;
     }
@@ -7697,6 +7766,9 @@ var ReadonlyArrayType = /** @class */ (function (_super) {
     function ReadonlyArrayType(name, is, validate, encode, type) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.type = type;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'ReadonlyArrayType';
         return _this;
     }
@@ -7775,6 +7847,9 @@ var ExactType = /** @class */ (function (_super) {
     function ExactType(name, is, validate, encode, type) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.type = type;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'ExactType';
         return _this;
     }
@@ -7854,6 +7929,9 @@ var NeverType = /** @class */ (function (_super) {
         function () {
             throw new Error('cannot encode never');
         }) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'NeverType';
         return _this;
     }
@@ -7874,6 +7952,9 @@ var AnyType = /** @class */ (function (_super) {
     __extends(AnyType, _super);
     function AnyType() {
         var _this = _super.call(this, 'any', function (_) { return true; }, exports.success, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'AnyType';
         return _this;
     }
@@ -7901,6 +7982,9 @@ var ObjectType = /** @class */ (function (_super) {
     __extends(ObjectType, _super);
     function ObjectType() {
         var _this = _super.call(this, 'object', function (u) { return u !== null && typeof u === 'object'; }, function (u, c) { return (_this.is(u) ? exports.success(u) : exports.failure(u, c)); }, exports.identity) || this;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'ObjectType';
         return _this;
     }
@@ -7952,6 +8036,9 @@ var StrictType = /** @class */ (function (_super) {
     encode, props) {
         var _this = _super.call(this, name, is, validate, encode) || this;
         _this.props = props;
+        /**
+         * @since 1.0.0
+         */
         _this._tag = 'StrictType';
         return _this;
     }
