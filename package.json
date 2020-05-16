@@ -30,7 +30,7 @@
     "@actions/github": "^2.1.1",
     "fp-ts": "^2.5.4",
     "io-ts": "^2.2.1",
-    "marked": "^0.8.2",
+    "marked": "^1.1.0",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
