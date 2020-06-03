@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.2.3",
     "@actions/exec": "^1.0.4",
-    "@actions/github": "^2.1.1",
+    "@actions/github": "^3.0.0",
     "fp-ts": "^2.5.4",
     "io-ts": "^2.2.1",
     "marked": "^0.8.2",
