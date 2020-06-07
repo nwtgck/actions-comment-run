@@ -2976,9 +2976,16 @@ async function run() {
                     // Execute script with shebang
                     await executeShebangScript(token.text);
                 }
-                const commentText = commentFromFile(core.getInput('comment-buffer'));
-                if (commentText) {
-                    postComment(commentText);
+                // Read the comment buffer file, if present, and post its contents as comment
+                try {
+                    const commentBuffer = core.getInput('comment-buffer');
+                    const commentText = fs.readFileSync(commentBuffer, 'utf8');
+                    if (commentText) {
+                        postComment(commentText);
+                    }
+                }
+                catch (error) {
+                    // Comment buffer file absent, do nothing
                 }
             }
         }
@@ -3046,14 +3053,6 @@ async function executeShebangScript(script) {
     finally {
         // Remove file
         fs.unlinkSync(fpath);
-    }
-}
-function commentFromFile(path) {
-    try {
-        return fs.readFileSync(path, 'utf8');
-    }
-    catch (error) {
-        // Comment buffer file absent, do nothing
     }
 }
 run();
