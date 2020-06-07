@@ -8,6 +8,9 @@ inputs:
   allowed-associations:
     description: Comment author associations allowed to execute scripts (e.g. '["OWNER", "COLLABORATOR"]')
     default: '["OWNER"]'
+  comment-buffer:
+    description: A temporary file to store comment text to be posted at the end
+    default: comment.buffer
 runs:
   using: 'node12'
   main: 'dist/index.js'

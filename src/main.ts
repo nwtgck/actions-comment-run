@@ -9,12 +9,8 @@ import * as marked from 'marked'
 import * as t from 'io-ts'
 import {isRight} from 'fp-ts/lib/Either'
 import * as fs from 'fs'
-import * as os from 'os'
-import * as path from 'path'
 
 import {callAsyncFunction} from './async-function'
-
-const COMMENTFILE = path.join(os.tmpdir(), 'comment-buffer.txt')
 
 const commentAuthorAssociationsType = t.array(t.string)
 
@@ -134,7 +130,7 @@ async function run(): Promise<void> {
           // Execute script with shebang
           await executeShebangScript(token.text)
         }
-        const commentText = commentFromFile()
+        const commentText = commentFromFile(core.getInput('comment-buffer'))
         if (commentText) {
           postComment(commentText)
         }
@@ -208,9 +204,9 @@ async function executeShebangScript(script: string): Promise<void> {
   }
 }
 
-function commentFromFile(): string | undefined {
+function commentFromFile(path: string): string | undefined {
   try {
-    return fs.readFileSync(COMMENTFILE, 'utf8')
+    return fs.readFileSync(path, 'utf8')
   } catch (error) {
     // Comment buffer file absent, do nothing
   }

@@ -327,15 +327,15 @@ print(np.array([1, 2, 3]))
 ```
 ````
 
-Redirect `STDOUT` and/or `STDERR` to `$TMPDIR/comment-buffer.txt` file or write any text to this file to post it as a comment.
+Redirect `STDOUT` and/or `STDERR` to `comment.buffer` file or write any text to this file to post it as a comment at the end (location of this buffer file can be customized using `comment-buffer` input variable).
 
 ````md
 @github-actions run
 
 ```sh
 #! /bin/sh
-echo "Files in $PWD" > /tmp/comment-buffer.txt
-ls -l >> /tmp/comment-buffer.txt
+echo "Files in $PWD" > comment.buffer
+ls -l >> comment.buffer
 ```
 ````
 

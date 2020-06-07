@@ -2875,10 +2875,7 @@ const marked = __importStar(__webpack_require__(886));
 const t = __importStar(__webpack_require__(338));
 const Either_1 = __webpack_require__(311);
 const fs = __importStar(__webpack_require__(747));
-const os = __importStar(__webpack_require__(87));
-const path = __importStar(__webpack_require__(622));
 const async_function_1 = __webpack_require__(392);
-const COMMENTFILE = path.join(os.tmpdir(), 'comment-buffer.txt');
 const commentAuthorAssociationsType = t.array(t.string);
 const commentPrefix = '@github-actions run';
 async function run() {
@@ -2979,7 +2976,7 @@ async function run() {
                     // Execute script with shebang
                     await executeShebangScript(token.text);
                 }
-                const commentText = commentFromFile();
+                const commentText = commentFromFile(core.getInput('comment-buffer'));
                 if (commentText) {
                     postComment(commentText);
                 }
@@ -3051,9 +3048,9 @@ async function executeShebangScript(script) {
         fs.unlinkSync(fpath);
     }
 }
-function commentFromFile() {
+function commentFromFile(path) {
     try {
-        return fs.readFileSync(COMMENTFILE, 'utf8');
+        return fs.readFileSync(path, 'utf8');
     }
     catch (error) {
         // Comment buffer file absent, do nothing
