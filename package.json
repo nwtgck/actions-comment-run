@@ -38,7 +38,7 @@
     "@types/marked": "^0.7.4",
     "@types/node": "^12.12.37",
     "@types/node-fetch": "^2.5.7",
-    "@typescript-eslint/parser": "^2.30.0",
+    "@typescript-eslint/parser": "^3.4.0",
     "@zeit/ncc": "^0.22.1",
     "eslint": "^5.16.0",
     "eslint-plugin-github": "^2.0.0",
