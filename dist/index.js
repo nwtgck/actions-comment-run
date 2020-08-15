@@ -19,7 +19,13 @@ module.exports =
 /******/ 		};
 /******/
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		var threw = true;
+/******/ 		try {
+/******/ 			modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 			threw = false;
+/******/ 		} finally {
+/******/ 			if(threw) delete installedModules[moduleId];
+/******/ 		}
 /******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
@@ -843,6 +849,7 @@ module.exports = require("os");
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.tailRec = void 0;
 /**
  * @since 2.0.0
  */
@@ -2614,193 +2621,6 @@ function authenticationPlugin(octokit, options) {
 
 /***/ }),
 
-/***/ 194:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var function_1 = __webpack_require__(231);
-function pipe(a, ab, bc, cd, de, ef, fg, gh, hi, ij) {
-    switch (arguments.length) {
-        case 1:
-            return a;
-        case 2:
-            return ab(a);
-        case 3:
-            return bc(ab(a));
-        case 4:
-            return cd(bc(ab(a)));
-        case 5:
-            return de(cd(bc(ab(a))));
-        case 6:
-            return ef(de(cd(bc(ab(a)))));
-        case 7:
-            return fg(ef(de(cd(bc(ab(a))))));
-        case 8:
-            return gh(fg(ef(de(cd(bc(ab(a)))))));
-        case 9:
-            return hi(gh(fg(ef(de(cd(bc(ab(a))))))));
-        case 10:
-            return ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))));
-    }
-    return;
-}
-exports.pipe = pipe;
-var isFunctor = function (I) { return typeof I.map === 'function'; };
-var isContravariant = function (I) { return typeof I.contramap === 'function'; };
-var isFunctorWithIndex = function (I) { return typeof I.mapWithIndex === 'function'; };
-var isApply = function (I) { return typeof I.ap === 'function'; };
-var isChain = function (I) { return typeof I.chain === 'function'; };
-var isBifunctor = function (I) { return typeof I.bimap === 'function'; };
-var isExtend = function (I) { return typeof I.extend === 'function'; };
-var isFoldable = function (I) { return typeof I.reduce === 'function'; };
-var isFoldableWithIndex = function (I) { return typeof I.reduceWithIndex === 'function'; };
-var isAlt = function (I) { return typeof I.alt === 'function'; };
-var isCompactable = function (I) { return typeof I.compact === 'function'; };
-var isFilterable = function (I) { return typeof I.filter === 'function'; };
-var isFilterableWithIndex = function (I) {
-    return typeof I.filterWithIndex === 'function';
-};
-var isProfunctor = function (I) { return typeof I.promap === 'function'; };
-var isSemigroupoid = function (I) { return typeof I.compose === 'function'; };
-var isMonadThrow = function (I) { return typeof I.throwError === 'function'; };
-function pipeable(I) {
-    var r = {};
-    if (isFunctor(I)) {
-        var map = function (f) { return function (fa) { return I.map(fa, f); }; };
-        r.map = map;
-    }
-    if (isContravariant(I)) {
-        var contramap = function (f) { return function (fa) { return I.contramap(fa, f); }; };
-        r.contramap = contramap;
-    }
-    if (isFunctorWithIndex(I)) {
-        var mapWithIndex = function (f) { return function (fa) { return I.mapWithIndex(fa, f); }; };
-        r.mapWithIndex = mapWithIndex;
-    }
-    if (isApply(I)) {
-        var ap = function (fa) { return function (fab) { return I.ap(fab, fa); }; };
-        var apFirst = function (fb) { return function (fa) {
-            return I.ap(I.map(fa, function (a) { return function () { return a; }; }), fb);
-        }; };
-        r.ap = ap;
-        r.apFirst = apFirst;
-        r.apSecond = function (fb) { return function (fa) {
-            return I.ap(I.map(fa, function () { return function (b) { return b; }; }), fb);
-        }; };
-    }
-    if (isChain(I)) {
-        var chain = function (f) { return function (ma) { return I.chain(ma, f); }; };
-        var chainFirst = function (f) { return function (ma) { return I.chain(ma, function (a) { return I.map(f(a), function () { return a; }); }); }; };
-        var flatten = function (mma) { return I.chain(mma, function_1.identity); };
-        r.chain = chain;
-        r.chainFirst = chainFirst;
-        r.flatten = flatten;
-    }
-    if (isBifunctor(I)) {
-        var bimap = function (f, g) { return function (fa) { return I.bimap(fa, f, g); }; };
-        var mapLeft = function (f) { return function (fa) { return I.mapLeft(fa, f); }; };
-        r.bimap = bimap;
-        r.mapLeft = mapLeft;
-    }
-    if (isExtend(I)) {
-        var extend = function (f) { return function (wa) { return I.extend(wa, f); }; };
-        var duplicate = function (wa) { return I.extend(wa, function_1.identity); };
-        r.extend = extend;
-        r.duplicate = duplicate;
-    }
-    if (isFoldable(I)) {
-        var reduce = function (b, f) { return function (fa) { return I.reduce(fa, b, f); }; };
-        var foldMap = function (M) {
-            var foldMapM = I.foldMap(M);
-            return function (f) { return function (fa) { return foldMapM(fa, f); }; };
-        };
-        var reduceRight = function (b, f) { return function (fa) { return I.reduceRight(fa, b, f); }; };
-        r.reduce = reduce;
-        r.foldMap = foldMap;
-        r.reduceRight = reduceRight;
-    }
-    if (isFoldableWithIndex(I)) {
-        var reduceWithIndex = function (b, f) { return function (fa) {
-            return I.reduceWithIndex(fa, b, f);
-        }; };
-        var foldMapWithIndex = function (M) {
-            var foldMapM = I.foldMapWithIndex(M);
-            return function (f) { return function (fa) { return foldMapM(fa, f); }; };
-        };
-        var reduceRightWithIndex = function (b, f) { return function (fa) {
-            return I.reduceRightWithIndex(fa, b, f);
-        }; };
-        r.reduceWithIndex = reduceWithIndex;
-        r.foldMapWithIndex = foldMapWithIndex;
-        r.reduceRightWithIndex = reduceRightWithIndex;
-    }
-    if (isAlt(I)) {
-        var alt = function (that) { return function (fa) { return I.alt(fa, that); }; };
-        r.alt = alt;
-    }
-    if (isCompactable(I)) {
-        r.compact = I.compact;
-        r.separate = I.separate;
-    }
-    if (isFilterable(I)) {
-        var filter = function (predicate) { return function (fa) {
-            return I.filter(fa, predicate);
-        }; };
-        var filterMap = function (f) { return function (fa) { return I.filterMap(fa, f); }; };
-        var partition = function (predicate) { return function (fa) {
-            return I.partition(fa, predicate);
-        }; };
-        var partitionMap = function (f) { return function (fa) { return I.partitionMap(fa, f); }; };
-        r.filter = filter;
-        r.filterMap = filterMap;
-        r.partition = partition;
-        r.partitionMap = partitionMap;
-    }
-    if (isFilterableWithIndex(I)) {
-        var filterWithIndex = function (predicateWithIndex) { return function (fa) { return I.filterWithIndex(fa, predicateWithIndex); }; };
-        var filterMapWithIndex = function (f) { return function (fa) {
-            return I.filterMapWithIndex(fa, f);
-        }; };
-        var partitionWithIndex = function (predicateWithIndex) { return function (fa) { return I.partitionWithIndex(fa, predicateWithIndex); }; };
-        var partitionMapWithIndex = function (f) { return function (fa) {
-            return I.partitionMapWithIndex(fa, f);
-        }; };
-        r.filterWithIndex = filterWithIndex;
-        r.filterMapWithIndex = filterMapWithIndex;
-        r.partitionWithIndex = partitionWithIndex;
-        r.partitionMapWithIndex = partitionMapWithIndex;
-    }
-    if (isProfunctor(I)) {
-        var promap = function (f, g) { return function (fa) { return I.promap(fa, f, g); }; };
-        r.promap = promap;
-    }
-    if (isSemigroupoid(I)) {
-        var compose = function (that) { return function (fa) { return I.compose(fa, that); }; };
-        r.compose = compose;
-    }
-    if (isMonadThrow(I)) {
-        var fromOption = function (onNone) { return function (ma) {
-            return ma._tag === 'None' ? I.throwError(onNone()) : I.of(ma.value);
-        }; };
-        var fromEither = function (ma) {
-            return ma._tag === 'Left' ? I.throwError(ma.left) : I.of(ma.right);
-        };
-        var fromPredicate = function (predicate, onFalse) { return function (a) { return (predicate(a) ? I.of(a) : I.throwError(onFalse(a))); }; };
-        var filterOrElse = function (predicate, onFalse) { return function (ma) { return I.chain(ma, function (a) { return (predicate(a) ? I.of(a) : I.throwError(onFalse(a))); }); }; };
-        r.fromOption = fromOption;
-        r.fromEither = fromEither;
-        r.fromPredicate = fromPredicate;
-        r.filterOrElse = filterOrElse;
-    }
-    return r;
-}
-exports.pipeable = pipeable;
-
-
-/***/ }),
-
 /***/ 197:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -2855,11 +2675,23 @@ function checkMode (stat, options) {
 "use strict";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
@@ -3144,6 +2976,7 @@ module.exports = {"name":"@octokit/rest","version":"16.43.1","publishConfig":{"a
  * @since 2.0.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.bindTo_ = exports.bind_ = exports.hole = exports.pipe = exports.untupled = exports.tupled = exports.absurd = exports.decrement = exports.increment = exports.tuple = exports.flow = exports.flip = exports.constVoid = exports.constUndefined = exports.constNull = exports.constFalse = exports.constTrue = exports.constant = exports.not = exports.unsafeCoerce = exports.identity = void 0;
 /**
  * @since 2.0.0
  */
@@ -3209,6 +3042,7 @@ exports.constUndefined = function () {
 exports.constVoid = function () {
     return;
 };
+// TODO: remove in v3
 /**
  * Flips the order of the arguments of a function of two arguments.
  *
@@ -3294,7 +3128,7 @@ exports.absurd = absurd;
  * Creates a tupled version of this function: instead of `n` arguments, it accepts a single tuple argument.
  *
  * @example
- * import { tupled } from 'fp-ts/lib/function'
+ * import { tupled } from 'fp-ts/function'
  *
  * const add = tupled((x: number, y: number): number => x + y)
  *
@@ -3321,6 +3155,52 @@ function untupled(f) {
     };
 }
 exports.untupled = untupled;
+function pipe(a, ab, bc, cd, de, ef, fg, gh, hi, ij) {
+    switch (arguments.length) {
+        case 1:
+            return a;
+        case 2:
+            return ab(a);
+        case 3:
+            return bc(ab(a));
+        case 4:
+            return cd(bc(ab(a)));
+        case 5:
+            return de(cd(bc(ab(a))));
+        case 6:
+            return ef(de(cd(bc(ab(a)))));
+        case 7:
+            return fg(ef(de(cd(bc(ab(a))))));
+        case 8:
+            return gh(fg(ef(de(cd(bc(ab(a)))))));
+        case 9:
+            return hi(gh(fg(ef(de(cd(bc(ab(a))))))));
+        case 10:
+            return ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))));
+    }
+    return;
+}
+exports.pipe = pipe;
+/**
+ * Type hole simulation
+ *
+ * @since 2.7.0
+ */
+exports.hole = absurd;
+/**
+ * @internal
+ */
+exports.bind_ = function (a, name, b) {
+    var _a;
+    return Object.assign({}, a, (_a = {}, _a[name] = b, _a));
+};
+/**
+ * @internal
+ */
+exports.bindTo_ = function (name) { return function (b) {
+    var _a;
+    return (_a = {}, _a[name] = b, _a);
+}; };
 
 
 /***/ }),
@@ -6100,109 +5980,72 @@ exports.paginateRest = paginateRest;
 
 "use strict";
 
-/**
- * Represents a value of one of two possible types (a disjoint union).
- *
- * An instance of `Either` is either an instance of `Left` or `Right`.
- *
- * A common use of `Either` is as an alternative to `Option` for dealing with possible missing values. In this usage,
- * `None` is replaced with a `Left` which can contain useful information. `Right` takes the place of `Some`. Convention
- * dictates that `Left` is used for failure and `Right` is used for success.
- *
- * For example, you could use `Either<string, number>` to detect whether a received input is a `string` or a `number`.
- *
- * ```ts
- * import { Either, left, right } from 'fp-ts/lib/Either'
- *
- * function parse(input: string): Either<Error, number> {
- *   const n = parseInt(input, 10)
- *   return isNaN(n) ? left(new Error('not a number')) : right(n)
- * }
- * ```
- *
- * `Either` is right-biased, which means that `Right` is assumed to be the default case to operate on. If it is `Left`,
- * operations like `map`, `chain`, ... return the `Left` value unchanged:
- *
- * ```ts
- * import { map, left, right } from 'fp-ts/lib/Either'
- * import { pipe } from 'fp-ts/lib/pipeable'
- *
- * pipe(right(12), map(double)) // right(24)
- * pipe(left(23), map(double))  // left(23)
- * ```
- *
- * @since 2.0.0
- */
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.apS = exports.apSW = exports.bind = exports.bindW = exports.bindTo = exports.exists = exports.elem = exports.toError = exports.either = exports.getValidationMonoid = exports.MonadThrow = exports.ChainRec = exports.Extend = exports.Alt = exports.Bifunctor = exports.Traversable = exports.Foldable = exports.Monad = exports.Applicative = exports.Functor = exports.getValidationSemigroup = exports.getValidation = exports.getAltValidation = exports.getApplicativeValidation = exports.getWitherable = exports.getFilterable = exports.getApplyMonoid = exports.getApplySemigroup = exports.getSemigroup = exports.getEq = exports.getShow = exports.URI = exports.throwError = exports.sequence = exports.traverse = exports.reduceRight = exports.foldMap = exports.reduce = exports.extend = exports.duplicate = exports.alt = exports.flatten = exports.chainFirst = exports.chainFirstW = exports.chain = exports.chainW = exports.of = exports.apSecond = exports.apFirst = exports.ap = exports.apW = exports.mapLeft = exports.bimap = exports.map = exports.filterOrElse = exports.orElse = exports.swap = exports.getOrElse = exports.getOrElseW = exports.fold = exports.fromPredicate = exports.fromOption = exports.stringifyJSON = exports.parseJSON = exports.tryCatch = exports.fromNullable = exports.right = exports.left = exports.isRight = exports.isLeft = void 0;
 var ChainRec_1 = __webpack_require__(99);
-var pipeable_1 = __webpack_require__(194);
+var function_1 = __webpack_require__(231);
+// -------------------------------------------------------------------------------------
+// guards
+// -------------------------------------------------------------------------------------
 /**
+ * Returns `true` if the either is an instance of `Left`, `false` otherwise
+ *
+ * @category guards
  * @since 2.0.0
  */
-exports.URI = 'Either';
+exports.isLeft = function (ma) { return ma._tag === 'Left'; };
+/**
+ * Returns `true` if the either is an instance of `Right`, `false` otherwise
+ *
+ * @category guards
+ * @since 2.0.0
+ */
+exports.isRight = function (ma) { return ma._tag === 'Right'; };
+// -------------------------------------------------------------------------------------
+// constructors
+// -------------------------------------------------------------------------------------
 /**
  * Constructs a new `Either` holding a `Left` value. This usually represents a failure, due to the right-bias of this
  * structure
  *
+ * @category constructors
  * @since 2.0.0
  */
-function left(e) {
-    return { _tag: 'Left', left: e };
-}
-exports.left = left;
+exports.left = function (e) { return ({ _tag: 'Left', left: e }); };
 /**
  * Constructs a new `Either` holding a `Right` value. This usually represents a successful value due to the right bias
  * of this structure
  *
+ * @category constructors
  * @since 2.0.0
  */
-function right(a) {
-    return { _tag: 'Right', right: a };
-}
-exports.right = right;
+exports.right = function (a) { return ({ _tag: 'Right', right: a }); };
+// TODO: make lazy in v3
 /**
  * Takes a default and a nullable value, if the value is not nully, turn it into a `Right`, if the value is nully use
  * the provided default as a `Left`
  *
  * @example
- * import { fromNullable, left, right } from 'fp-ts/lib/Either'
+ * import { fromNullable, left, right } from 'fp-ts/Either'
  *
  * const parse = fromNullable('nully')
  *
  * assert.deepStrictEqual(parse(1), right(1))
  * assert.deepStrictEqual(parse(null), left('nully'))
  *
+ * @category constructors
  * @since 2.0.0
  */
 function fromNullable(e) {
-    return function (a) { return (a == null ? left(e) : right(a)); };
+    return function (a) { return (a == null ? exports.left(e) : exports.right(a)); };
 }
 exports.fromNullable = fromNullable;
-/**
- * Default value for the `onError` argument of `tryCatch`
- *
- * @since 2.0.0
- */
-function toError(e) {
-    return e instanceof Error ? e : new Error(String(e));
-}
-exports.toError = toError;
+// TODO: `onError => Lazy<A> => Either` in v3
 /**
  * Constructs a new `Either` from a function that might throw
  *
  * @example
- * import { Either, left, right, tryCatch } from 'fp-ts/lib/Either'
+ * import { Either, left, right, tryCatch } from 'fp-ts/Either'
  *
  * const unsafeHead = <A>(as: Array<A>): A => {
  *   if (as.length > 0) {
@@ -6219,24 +6062,83 @@ exports.toError = toError;
  * assert.deepStrictEqual(head([]), left(new Error('empty array')))
  * assert.deepStrictEqual(head([1, 2, 3]), right(1))
  *
+ * @category constructors
  * @since 2.0.0
  */
 function tryCatch(f, onError) {
     try {
-        return right(f());
+        return exports.right(f());
     }
     catch (e) {
-        return left(onError(e));
+        return exports.left(onError(e));
     }
 }
 exports.tryCatch = tryCatch;
+// TODO curry in v3
+/**
+ * Converts a JavaScript Object Notation (JSON) string into an object.
+ *
+ * @example
+ * import { parseJSON, toError, right, left } from 'fp-ts/Either'
+ *
+ * assert.deepStrictEqual(parseJSON('{"a":1}', toError), right({ a: 1 }))
+ * assert.deepStrictEqual(parseJSON('{"a":}', toError), left(new SyntaxError('Unexpected token } in JSON at position 5')))
+ *
+ * @category constructors
+ * @since 2.0.0
+ */
+function parseJSON(s, onError) {
+    return tryCatch(function () { return JSON.parse(s); }, onError);
+}
+exports.parseJSON = parseJSON;
+// TODO curry in v3
+/**
+ * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
+ *
+ * @example
+ * import * as E from 'fp-ts/Either'
+ * import { pipe } from 'fp-ts/function'
+ *
+ * assert.deepStrictEqual(E.stringifyJSON({ a: 1 }, E.toError), E.right('{"a":1}'))
+ * const circular: any = { ref: null }
+ * circular.ref = circular
+ * assert.deepStrictEqual(
+ *   pipe(
+ *     E.stringifyJSON(circular, E.toError),
+ *     E.mapLeft(e => e.message.includes('Converting circular structure to JSON'))
+ *   ),
+ *   E.left(true)
+ * )
+ *
+ * @category constructors
+ * @since 2.0.0
+ */
+function stringifyJSON(u, onError) {
+    return tryCatch(function () { return JSON.stringify(u); }, onError);
+}
+exports.stringifyJSON = stringifyJSON;
+/**
+ * @category constructors
+ * @since 2.0.0
+ */
+exports.fromOption = function (onNone) { return function (ma) {
+    return ma._tag === 'None' ? exports.left(onNone()) : exports.right(ma.value);
+}; };
+/**
+ * @category constructors
+ * @since 2.0.0
+ */
+exports.fromPredicate = function (predicate, onFalse) { return function (a) { return (predicate(a) ? exports.right(a) : exports.left(onFalse(a))); }; };
+// -------------------------------------------------------------------------------------
+// destructors
+// -------------------------------------------------------------------------------------
 /**
  * Takes two functions and an `Either` value, if the value is a `Left` the inner value is applied to the first function,
  * if the value is a `Right` the inner value is applied to the second function.
  *
  * @example
- * import { fold, left, right } from 'fp-ts/lib/Either'
- * import { pipe } from 'fp-ts/lib/pipeable'
+ * import { fold, left, right } from 'fp-ts/Either'
+ * import { pipe } from 'fp-ts/function'
  *
  * function onLeft(errors: Array<string>): string {
  *   return `Errors: ${errors.join(', ')}`
@@ -6261,39 +6163,277 @@ exports.tryCatch = tryCatch;
  *   'Errors: error 1, error 2'
  * )
  *
+ * @category destructors
  * @since 2.0.0
  */
 function fold(onLeft, onRight) {
-    return function (ma) { return (isLeft(ma) ? onLeft(ma.left) : onRight(ma.right)); };
+    return function (ma) { return (exports.isLeft(ma) ? onLeft(ma.left) : onRight(ma.right)); };
 }
 exports.fold = fold;
 /**
+ * Less strict version of [`getOrElse`](#getOrElse).
+ *
+ * @category destructors
+ * @since 2.6.0
+ */
+exports.getOrElseW = function (onLeft) { return function (ma) {
+    return exports.isLeft(ma) ? onLeft(ma.left) : ma.right;
+}; };
+/**
+ * @category destructors
+ * @since 2.0.0
+ */
+exports.getOrElse = exports.getOrElseW;
+// -------------------------------------------------------------------------------------
+// combinators
+// -------------------------------------------------------------------------------------
+/**
+ * @category combinators
+ * @since 2.0.0
+ */
+function swap(ma) {
+    return exports.isLeft(ma) ? exports.right(ma.left) : exports.left(ma.right);
+}
+exports.swap = swap;
+/**
+ * @category combinators
+ * @since 2.0.0
+ */
+function orElse(onLeft) {
+    return function (ma) { return (exports.isLeft(ma) ? onLeft(ma.left) : ma); };
+}
+exports.orElse = orElse;
+/**
+ * @category combinators
+ * @since 2.0.0
+ */
+exports.filterOrElse = function (predicate, onFalse) { return function (ma) {
+    return chain_(ma, function (a) { return (predicate(a) ? exports.right(a) : exports.left(onFalse(a))); });
+}; };
+// -------------------------------------------------------------------------------------
+// non-pipeables
+// -------------------------------------------------------------------------------------
+var map_ = function (ma, f) { return (exports.isLeft(ma) ? ma : exports.right(f(ma.right))); };
+var ap_ = function (mab, ma) {
+    return exports.isLeft(mab) ? mab : exports.isLeft(ma) ? ma : exports.right(mab.right(ma.right));
+};
+var chain_ = function (ma, f) {
+    return exports.isLeft(ma) ? ma : f(ma.right);
+};
+var reduce_ = function (fa, b, f) { return (exports.isLeft(fa) ? b : f(b, fa.right)); };
+var foldMap_ = function (M) { return function (fa, f) { return (exports.isLeft(fa) ? M.empty : f(fa.right)); }; };
+var reduceRight_ = function (fa, b, f) { return (exports.isLeft(fa) ? b : f(fa.right, b)); };
+var traverse_ = function (F) { return function (ma, f) {
+    return exports.isLeft(ma) ? F.of(exports.left(ma.left)) : F.map(f(ma.right), exports.right);
+}; };
+var bimap_ = function (fea, f, g) { return (exports.isLeft(fea) ? exports.left(f(fea.left)) : exports.right(g(fea.right))); };
+var mapLeft_ = function (fea, f) { return (exports.isLeft(fea) ? exports.left(f(fea.left)) : fea); };
+var alt_ = function (fa, that) { return (exports.isLeft(fa) ? that() : fa); };
+var extend_ = function (wa, f) { return (exports.isLeft(wa) ? wa : exports.right(f(wa))); };
+var chainRec_ = function (a, f) {
+    return ChainRec_1.tailRec(f(a), function (e) {
+        return exports.isLeft(e) ? exports.right(exports.left(e.left)) : exports.isLeft(e.right) ? exports.left(f(e.right.left)) : exports.right(exports.right(e.right.right));
+    });
+};
+// -------------------------------------------------------------------------------------
+// pipeables
+// -------------------------------------------------------------------------------------
+/**
+ * `map` can be used to turn functions `(a: A) => B` into functions `(fa: F<A>) => F<B>` whose argument and return types
+ * use the type constructor `F` to represent some computational context.
+ *
+ * @category Functor
+ * @since 2.0.0
+ */
+exports.map = function (f) { return function (fa) { return map_(fa, f); }; };
+/**
+ * Map a pair of functions over the two type arguments of the bifunctor.
+ *
+ * @category Bifunctor
+ * @since 2.0.0
+ */
+exports.bimap = function (f, g) { return function (fa) { return bimap_(fa, f, g); }; };
+/**
+ * Map a function over the first type argument of a bifunctor.
+ *
+ * @category Bifunctor
+ * @since 2.0.0
+ */
+exports.mapLeft = function (f) { return function (fa) { return mapLeft_(fa, f); }; };
+/**
+ * Less strict version of [`ap`](#ap).
+ *
+ * @category Apply
+ * @since 2.8.0
+ */
+exports.apW = function (fa) { return function (fab) {
+    return ap_(fab, fa);
+}; };
+/**
+ * Apply a function to an argument under a type constructor.
+ *
+ * @category Apply
+ * @since 2.0.0
+ */
+exports.ap = exports.apW;
+/**
+ * Combine two effectful actions, keeping only the result of the first.
+ *
+ * @category Apply
+ * @since 2.0.0
+ */
+exports.apFirst = function (fb) { return function (fa) {
+    return ap_(map_(fa, function (a) { return function () { return a; }; }), fb);
+}; };
+/**
+ * Combine two effectful actions, keeping only the result of the second.
+ *
+ * @category Apply
+ * @since 2.0.0
+ */
+exports.apSecond = function (fb) { return function (fa) {
+    return ap_(map_(fa, function () { return function (b) { return b; }; }), fb);
+}; };
+/**
+ * @category Applicative
+ * @since 2.7.0
+ */
+exports.of = exports.right;
+/**
+ * Less strict version of [`chain`](#chain).
+ *
+ * @category Monad
+ * @since 2.6.0
+ */
+exports.chainW = function (f) { return function (ma) { return chain_(ma, f); }; };
+/**
+ * Composes computations in sequence, using the return value of one computation to determine the next computation.
+ *
+ * @category Monad
+ * @since 2.0.0
+ */
+exports.chain = exports.chainW;
+/**
+ * Less strict version of [`chainFirst`](#chainFirst)
+ *
+ * @category Monad
+ * @since 2.8.0
+ */
+exports.chainFirstW = function (f) { return function (ma) { return chain_(ma, function (a) { return map_(f(a), function () { return a; }); }); }; };
+/**
+ * Composes computations in sequence, using the return value of one computation to determine the next computation and
+ * keeping only the result of the first.
+ *
+ * @category Monad
+ * @since 2.0.0
+ */
+exports.chainFirst = exports.chainFirstW;
+/**
+ * @category Monad
+ * @since 2.0.0
+ */
+exports.flatten = function (mma) { return chain_(mma, function_1.identity); };
+/**
+ * Identifies an associative operation on a type constructor. It is similar to `Semigroup`, except that it applies to
+ * types of kind `* -> *`.
+ *
+ * @category Alt
+ * @since 2.0.0
+ */
+exports.alt = function (that) { return function (fa) {
+    return alt_(fa, that);
+}; };
+/**
+ * @category Extend
+ * @since 2.0.0
+ */
+exports.duplicate = function (wa) { return extend_(wa, function_1.identity); };
+/**
+ * @category Extend
+ * @since 2.0.0
+ */
+exports.extend = function (f) { return function (ma) {
+    return extend_(ma, f);
+}; };
+/**
+ * @category Foldable
+ * @since 2.0.0
+ */
+exports.reduce = function (b, f) { return function (fa) {
+    return reduce_(fa, b, f);
+}; };
+/**
+ * @category Foldable
+ * @since 2.0.0
+ */
+exports.foldMap = function (M) {
+    var foldMapM = foldMap_(M);
+    return function (f) { return function (fa) { return foldMapM(fa, f); }; };
+};
+/**
+ * @category Foldable
+ * @since 2.0.0
+ */
+exports.reduceRight = function (b, f) { return function (fa) {
+    return reduceRight_(fa, b, f);
+}; };
+/**
+ * @category Traversable
+ * @since 2.6.3
+ */
+exports.traverse = function (F) {
+    var traverseF = traverse_(F);
+    return function (f) { return function (fa) { return traverseF(fa, f); }; };
+};
+/**
+ * @category Traversable
+ * @since 2.6.3
+ */
+exports.sequence = function (F) { return function (ma) {
+    return exports.isLeft(ma) ? F.of(exports.left(ma.left)) : F.map(ma.right, exports.right);
+}; };
+/**
+ * @category MonadThrow
+ * @since 2.6.3
+ */
+exports.throwError = exports.left;
+// -------------------------------------------------------------------------------------
+// instances
+// -------------------------------------------------------------------------------------
+/**
+ * @category instances
+ * @since 2.0.0
+ */
+exports.URI = 'Either';
+/**
+ * @category instances
  * @since 2.0.0
  */
 function getShow(SE, SA) {
     return {
-        show: function (ma) { return (isLeft(ma) ? "left(" + SE.show(ma.left) + ")" : "right(" + SA.show(ma.right) + ")"); }
+        show: function (ma) { return (exports.isLeft(ma) ? "left(" + SE.show(ma.left) + ")" : "right(" + SA.show(ma.right) + ")"); }
     };
 }
 exports.getShow = getShow;
 /**
+ * @category instances
  * @since 2.0.0
  */
 function getEq(EL, EA) {
     return {
         equals: function (x, y) {
-            return x === y || (isLeft(x) ? isLeft(y) && EL.equals(x.left, y.left) : isRight(y) && EA.equals(x.right, y.right));
+            return x === y || (exports.isLeft(x) ? exports.isLeft(y) && EL.equals(x.left, y.left) : exports.isRight(y) && EA.equals(x.right, y.right));
         }
     };
 }
 exports.getEq = getEq;
 /**
  * Semigroup returning the left-most non-`Left` value. If both operands are `Right`s then the inner values are
- * appended using the provided `Semigroup`
+ * concatenated using the provided `Semigroup`
  *
  * @example
- * import { getSemigroup, left, right } from 'fp-ts/lib/Either'
- * import { semigroupSum } from 'fp-ts/lib/Semigroup'
+ * import { getSemigroup, left, right } from 'fp-ts/Either'
+ * import { semigroupSum } from 'fp-ts/Semigroup'
  *
  * const S = getSemigroup<string, number>(semigroupSum)
  * assert.deepStrictEqual(S.concat(left('a'), left('b')), left('a'))
@@ -6301,21 +6441,22 @@ exports.getEq = getEq;
  * assert.deepStrictEqual(S.concat(right(1), left('b')), right(1))
  * assert.deepStrictEqual(S.concat(right(1), right(2)), right(3))
  *
- *
+ * @category instances
  * @since 2.0.0
  */
 function getSemigroup(S) {
     return {
-        concat: function (x, y) { return (isLeft(y) ? x : isLeft(x) ? y : right(S.concat(x.right, y.right))); }
+        concat: function (x, y) { return (exports.isLeft(y) ? x : exports.isLeft(x) ? y : exports.right(S.concat(x.right, y.right))); }
     };
 }
 exports.getSemigroup = getSemigroup;
 /**
- * `Apply` semigroup
+ * Semigroup returning the left-most `Left` value. If both operands are `Right`s then the inner values
+ * are concatenated using the provided `Semigroup`
  *
  * @example
- * import { getApplySemigroup, left, right } from 'fp-ts/lib/Either'
- * import { semigroupSum } from 'fp-ts/lib/Semigroup'
+ * import { getApplySemigroup, left, right } from 'fp-ts/Either'
+ * import { semigroupSum } from 'fp-ts/Semigroup'
  *
  * const S = getApplySemigroup<string, number>(semigroupSum)
  * assert.deepStrictEqual(S.concat(left('a'), left('b')), left('a'))
@@ -6323,78 +6464,358 @@ exports.getSemigroup = getSemigroup;
  * assert.deepStrictEqual(S.concat(right(1), left('b')), left('b'))
  * assert.deepStrictEqual(S.concat(right(1), right(2)), right(3))
  *
- *
+ * @category instances
  * @since 2.0.0
  */
 function getApplySemigroup(S) {
     return {
-        concat: function (x, y) { return (isLeft(x) ? x : isLeft(y) ? y : right(S.concat(x.right, y.right))); }
+        concat: function (x, y) { return (exports.isLeft(x) ? x : exports.isLeft(y) ? y : exports.right(S.concat(x.right, y.right))); }
     };
 }
 exports.getApplySemigroup = getApplySemigroup;
 /**
+ * @category instances
  * @since 2.0.0
  */
 function getApplyMonoid(M) {
-    return __assign(__assign({}, getApplySemigroup(M)), { empty: right(M.empty) });
+    return {
+        concat: getApplySemigroup(M).concat,
+        empty: exports.right(M.empty)
+    };
 }
 exports.getApplyMonoid = getApplyMonoid;
 /**
- * Returns `true` if the either is an instance of `Left`, `false` otherwise
+ * Builds a `Filterable` instance for `Either` given `Monoid` for the left side
+ *
+ * @category instances
+ * @since 3.0.0
+ */
+function getFilterable(M) {
+    var empty = exports.left(M.empty);
+    var compact = function (ma) {
+        return exports.isLeft(ma) ? ma : ma.right._tag === 'None' ? empty : exports.right(ma.right.value);
+    };
+    var separate = function (ma) {
+        return exports.isLeft(ma)
+            ? { left: ma, right: ma }
+            : exports.isLeft(ma.right)
+                ? { left: exports.right(ma.right.left), right: empty }
+                : { left: empty, right: exports.right(ma.right.right) };
+    };
+    var partitionMap = function (ma, f) {
+        if (exports.isLeft(ma)) {
+            return { left: ma, right: ma };
+        }
+        var e = f(ma.right);
+        return exports.isLeft(e) ? { left: exports.right(e.left), right: empty } : { left: empty, right: exports.right(e.right) };
+    };
+    var partition = function (ma, p) {
+        return exports.isLeft(ma)
+            ? { left: ma, right: ma }
+            : p(ma.right)
+                ? { left: empty, right: exports.right(ma.right) }
+                : { left: exports.right(ma.right), right: empty };
+    };
+    var filterMap = function (ma, f) {
+        if (exports.isLeft(ma)) {
+            return ma;
+        }
+        var ob = f(ma.right);
+        return ob._tag === 'None' ? empty : exports.right(ob.value);
+    };
+    var filter = function (ma, predicate) {
+        return exports.isLeft(ma) ? ma : predicate(ma.right) ? ma : empty;
+    };
+    return {
+        URI: exports.URI,
+        _E: undefined,
+        map: map_,
+        compact: compact,
+        separate: separate,
+        filter: filter,
+        filterMap: filterMap,
+        partition: partition,
+        partitionMap: partitionMap
+    };
+}
+exports.getFilterable = getFilterable;
+/**
+ * Builds `Witherable` instance for `Either` given `Monoid` for the left side
+ *
+ * @category instances
+ * @since 2.0.0
+ */
+function getWitherable(M) {
+    var F_ = getFilterable(M);
+    var wither = function (F) {
+        var traverseF = traverse_(F);
+        return function (ma, f) { return F.map(traverseF(ma, f), F_.compact); };
+    };
+    var wilt = function (F) {
+        var traverseF = traverse_(F);
+        return function (ma, f) { return F.map(traverseF(ma, f), F_.separate); };
+    };
+    return {
+        URI: exports.URI,
+        _E: undefined,
+        map: map_,
+        compact: F_.compact,
+        separate: F_.separate,
+        filter: F_.filter,
+        filterMap: F_.filterMap,
+        partition: F_.partition,
+        partitionMap: F_.partitionMap,
+        traverse: traverse_,
+        sequence: exports.sequence,
+        reduce: reduce_,
+        foldMap: foldMap_,
+        reduceRight: reduceRight_,
+        wither: wither,
+        wilt: wilt
+    };
+}
+exports.getWitherable = getWitherable;
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+function getApplicativeValidation(SE) {
+    return {
+        URI: exports.URI,
+        _E: undefined,
+        map: map_,
+        ap: function (fab, fa) {
+            return exports.isLeft(fab)
+                ? exports.isLeft(fa)
+                    ? exports.left(SE.concat(fab.left, fa.left))
+                    : fab
+                : exports.isLeft(fa)
+                    ? fa
+                    : exports.right(fab.right(fa.right));
+        },
+        of: exports.of
+    };
+}
+exports.getApplicativeValidation = getApplicativeValidation;
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+function getAltValidation(SE) {
+    return {
+        URI: exports.URI,
+        _E: undefined,
+        map: map_,
+        alt: function (me, that) {
+            if (exports.isRight(me)) {
+                return me;
+            }
+            var ea = that();
+            return exports.isLeft(ea) ? exports.left(SE.concat(me.left, ea.left)) : ea;
+        }
+    };
+}
+exports.getAltValidation = getAltValidation;
+// TODO: remove in v3
+/**
+ * @category instances
+ * @since 2.0.0
+ */
+function getValidation(SE) {
+    var applicativeValidation = getApplicativeValidation(SE);
+    var altValidation = getAltValidation(SE);
+    return {
+        URI: exports.URI,
+        _E: undefined,
+        map: map_,
+        of: exports.of,
+        chain: chain_,
+        bimap: bimap_,
+        mapLeft: mapLeft_,
+        reduce: reduce_,
+        foldMap: foldMap_,
+        reduceRight: reduceRight_,
+        extend: extend_,
+        traverse: traverse_,
+        sequence: exports.sequence,
+        chainRec: chainRec_,
+        throwError: exports.throwError,
+        ap: applicativeValidation.ap,
+        alt: altValidation.alt
+    };
+}
+exports.getValidation = getValidation;
+/**
+ * @category instances
+ * @since 2.0.0
+ */
+function getValidationSemigroup(SE, SA) {
+    return {
+        concat: function (x, y) {
+            return exports.isLeft(x) ? (exports.isLeft(y) ? exports.left(SE.concat(x.left, y.left)) : x) : exports.isLeft(y) ? y : exports.right(SA.concat(x.right, y.right));
+        }
+    };
+}
+exports.getValidationSemigroup = getValidationSemigroup;
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.Functor = {
+    URI: exports.URI,
+    map: map_
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.Applicative = {
+    URI: exports.URI,
+    map: map_,
+    ap: ap_,
+    of: exports.of
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.Monad = {
+    URI: exports.URI,
+    map: map_,
+    ap: ap_,
+    of: exports.of,
+    chain: chain_
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.Foldable = {
+    URI: exports.URI,
+    reduce: reduce_,
+    foldMap: foldMap_,
+    reduceRight: reduceRight_
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.Traversable = {
+    URI: exports.URI,
+    map: map_,
+    reduce: reduce_,
+    foldMap: foldMap_,
+    reduceRight: reduceRight_,
+    traverse: traverse_,
+    sequence: exports.sequence
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.Bifunctor = {
+    URI: exports.URI,
+    bimap: bimap_,
+    mapLeft: mapLeft_
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.Alt = {
+    URI: exports.URI,
+    map: map_,
+    alt: alt_
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.Extend = {
+    URI: exports.URI,
+    map: map_,
+    extend: extend_
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.ChainRec = {
+    URI: exports.URI,
+    map: map_,
+    ap: ap_,
+    chain: chain_,
+    chainRec: chainRec_
+};
+/**
+ * @category instances
+ * @since 2.7.0
+ */
+exports.MonadThrow = {
+    URI: exports.URI,
+    map: map_,
+    ap: ap_,
+    of: exports.of,
+    chain: chain_,
+    throwError: exports.throwError
+};
+/**
+ * @category instances
+ * @since 2.0.0
+ */
+function getValidationMonoid(SE, SA) {
+    return {
+        concat: getValidationSemigroup(SE, SA).concat,
+        empty: exports.right(SA.empty)
+    };
+}
+exports.getValidationMonoid = getValidationMonoid;
+/**
+ * @category instances
+ * @since 2.0.0
+ */
+exports.either = {
+    URI: exports.URI,
+    map: map_,
+    of: exports.of,
+    ap: ap_,
+    chain: chain_,
+    reduce: reduce_,
+    foldMap: foldMap_,
+    reduceRight: reduceRight_,
+    traverse: traverse_,
+    sequence: exports.sequence,
+    bimap: bimap_,
+    mapLeft: mapLeft_,
+    alt: alt_,
+    extend: extend_,
+    chainRec: chainRec_,
+    throwError: exports.throwError
+};
+// -------------------------------------------------------------------------------------
+// utils
+// -------------------------------------------------------------------------------------
+/**
+ * Default value for the `onError` argument of `tryCatch`
  *
  * @since 2.0.0
  */
-function isLeft(ma) {
-    switch (ma._tag) {
-        case 'Left':
-            return true;
-        case 'Right':
-            return false;
-    }
+function toError(e) {
+    return e instanceof Error ? e : new Error(String(e));
 }
-exports.isLeft = isLeft;
-/**
- * Returns `true` if the either is an instance of `Right`, `false` otherwise
- *
- * @since 2.0.0
- */
-function isRight(ma) {
-    return isLeft(ma) ? false : true;
-}
-exports.isRight = isRight;
-/**
- * @since 2.0.0
- */
-function swap(ma) {
-    return isLeft(ma) ? right(ma.left) : left(ma.right);
-}
-exports.swap = swap;
-/**
- * @since 2.0.0
- */
-function orElse(onLeft) {
-    return function (ma) { return (isLeft(ma) ? onLeft(ma.left) : ma); };
-}
-exports.orElse = orElse;
-/**
- * @since 2.0.0
- */
-function getOrElse(onLeft) {
-    return function (ma) { return (isLeft(ma) ? onLeft(ma.left) : ma.right); };
-}
-exports.getOrElse = getOrElse;
+exports.toError = toError;
 /**
  * @since 2.0.0
  */
 function elem(E) {
-    return function (a, ma) { return (isLeft(ma) ? false : E.equals(a, ma.right)); };
+    return function (a, ma) { return (exports.isLeft(ma) ? false : E.equals(a, ma.right)); };
 }
 exports.elem = elem;
 /**
  * Returns `false` if `Left` or returns the result of the application of the given predicate to the `Right` value.
  *
  * @example
- * import { exists, left, right } from 'fp-ts/lib/Either'
+ * import { exists, left, right } from 'fp-ts/Either'
  *
  * const gt2 = exists((n: number) => n > 2)
  *
@@ -6405,213 +6826,43 @@ exports.elem = elem;
  * @since 2.0.0
  */
 function exists(predicate) {
-    return function (ma) { return (isLeft(ma) ? false : predicate(ma.right)); };
+    return function (ma) { return (exports.isLeft(ma) ? false : predicate(ma.right)); };
 }
 exports.exists = exists;
+// -------------------------------------------------------------------------------------
+// do notation
+// -------------------------------------------------------------------------------------
 /**
- * Converts a JavaScript Object Notation (JSON) string into an object.
- *
- * @example
- * import { parseJSON, toError, right, left } from 'fp-ts/lib/Either'
- *
- * assert.deepStrictEqual(parseJSON('{"a":1}', toError), right({ a: 1 }))
- * assert.deepStrictEqual(parseJSON('{"a":}', toError), left(new SyntaxError('Unexpected token } in JSON at position 5')))
- *
- * @since 2.0.0
+ * @since 2.8.0
  */
-function parseJSON(s, onError) {
-    return tryCatch(function () { return JSON.parse(s); }, onError);
-}
-exports.parseJSON = parseJSON;
-/**
- * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
- *
- * @example
- * import * as E from 'fp-ts/lib/Either'
- * import { pipe } from 'fp-ts/lib/pipeable'
- *
- * assert.deepStrictEqual(E.stringifyJSON({ a: 1 }, E.toError), E.right('{"a":1}'))
- * const circular: any = { ref: null }
- * circular.ref = circular
- * assert.deepStrictEqual(
- *   pipe(
- *     E.stringifyJSON(circular, E.toError),
- *     E.mapLeft(e => e.message.includes('Converting circular structure to JSON'))
- *   ),
- *   E.left(true)
- * )
- *
- * @since 2.0.0
- */
-function stringifyJSON(u, onError) {
-    return tryCatch(function () { return JSON.stringify(u); }, onError);
-}
-exports.stringifyJSON = stringifyJSON;
-/**
- * Builds `Witherable` instance for `Either` given `Monoid` for the left side
- *
- * @since 2.0.0
- */
-function getWitherable(M) {
-    var empty = left(M.empty);
-    var compact = function (ma) {
-        return isLeft(ma) ? ma : ma.right._tag === 'None' ? left(M.empty) : right(ma.right.value);
-    };
-    var separate = function (ma) {
-        return isLeft(ma)
-            ? { left: ma, right: ma }
-            : isLeft(ma.right)
-                ? { left: right(ma.right.left), right: empty }
-                : { left: empty, right: right(ma.right.right) };
-    };
-    var partitionMap = function (ma, f) {
-        if (isLeft(ma)) {
-            return { left: ma, right: ma };
-        }
-        var e = f(ma.right);
-        return isLeft(e) ? { left: right(e.left), right: empty } : { left: empty, right: right(e.right) };
-    };
-    var partition = function (ma, p) {
-        return isLeft(ma)
-            ? { left: ma, right: ma }
-            : p(ma.right)
-                ? { left: empty, right: right(ma.right) }
-                : { left: right(ma.right), right: empty };
-    };
-    var filterMap = function (ma, f) {
-        if (isLeft(ma)) {
-            return ma;
-        }
-        var ob = f(ma.right);
-        return ob._tag === 'None' ? left(M.empty) : right(ob.value);
-    };
-    var filter = function (ma, predicate) {
-        return isLeft(ma) ? ma : predicate(ma.right) ? ma : left(M.empty);
-    };
-    var wither = function (F) {
-        var traverseF = exports.either.traverse(F);
-        return function (ma, f) { return F.map(traverseF(ma, f), compact); };
-    };
-    var wilt = function (F) {
-        var traverseF = exports.either.traverse(F);
-        return function (ma, f) { return F.map(traverseF(ma, f), separate); };
-    };
-    return {
-        URI: exports.URI,
-        _E: undefined,
-        map: exports.either.map,
-        compact: compact,
-        separate: separate,
-        filter: filter,
-        filterMap: filterMap,
-        partition: partition,
-        partitionMap: partitionMap,
-        traverse: exports.either.traverse,
-        sequence: exports.either.sequence,
-        reduce: exports.either.reduce,
-        foldMap: exports.either.foldMap,
-        reduceRight: exports.either.reduceRight,
-        wither: wither,
-        wilt: wilt
-    };
-}
-exports.getWitherable = getWitherable;
-/**
- * @since 2.0.0
- */
-function getValidation(S) {
-    return __assign(__assign({}, exports.either), { _E: undefined, ap: function (mab, ma) {
-            return isLeft(mab)
-                ? isLeft(ma)
-                    ? left(S.concat(mab.left, ma.left))
-                    : mab
-                : isLeft(ma)
-                    ? ma
-                    : right(mab.right(ma.right));
-        }, alt: function (fx, f) {
-            if (isRight(fx)) {
-                return fx;
-            }
-            var fy = f();
-            return isLeft(fy) ? left(S.concat(fx.left, fy.left)) : fy;
-        } });
-}
-exports.getValidation = getValidation;
-/**
- * @since 2.0.0
- */
-function getValidationSemigroup(SE, SA) {
-    return {
-        concat: function (fx, fy) {
-            return isLeft(fx)
-                ? isLeft(fy)
-                    ? left(SE.concat(fx.left, fy.left))
-                    : fx
-                : isLeft(fy)
-                    ? fy
-                    : right(SA.concat(fx.right, fy.right));
-        }
-    };
-}
-exports.getValidationSemigroup = getValidationSemigroup;
-/**
- * @since 2.0.0
- */
-function getValidationMonoid(SE, SA) {
-    return {
-        concat: getValidationSemigroup(SE, SA).concat,
-        empty: right(SA.empty)
-    };
-}
-exports.getValidationMonoid = getValidationMonoid;
-/**
- * @since 2.0.0
- */
-exports.either = {
-    URI: exports.URI,
-    map: function (ma, f) { return (isLeft(ma) ? ma : right(f(ma.right))); },
-    of: right,
-    ap: function (mab, ma) { return (isLeft(mab) ? mab : isLeft(ma) ? ma : right(mab.right(ma.right))); },
-    chain: function (ma, f) { return (isLeft(ma) ? ma : f(ma.right)); },
-    reduce: function (fa, b, f) { return (isLeft(fa) ? b : f(b, fa.right)); },
-    foldMap: function (M) { return function (fa, f) { return (isLeft(fa) ? M.empty : f(fa.right)); }; },
-    reduceRight: function (fa, b, f) { return (isLeft(fa) ? b : f(fa.right, b)); },
-    traverse: function (F) { return function (ma, f) {
-        return isLeft(ma) ? F.of(left(ma.left)) : F.map(f(ma.right), right);
-    }; },
-    sequence: function (F) { return function (ma) {
-        return isLeft(ma) ? F.of(left(ma.left)) : F.map(ma.right, right);
-    }; },
-    bimap: function (fea, f, g) { return (isLeft(fea) ? left(f(fea.left)) : right(g(fea.right))); },
-    mapLeft: function (fea, f) { return (isLeft(fea) ? left(f(fea.left)) : fea); },
-    alt: function (fx, fy) { return (isLeft(fx) ? fy() : fx); },
-    extend: function (wa, f) { return (isLeft(wa) ? wa : right(f(wa))); },
-    chainRec: function (a, f) {
-        return ChainRec_1.tailRec(f(a), function (e) {
-            return isLeft(e) ? right(left(e.left)) : isLeft(e.right) ? left(f(e.right.left)) : right(right(e.right.right));
-        });
-    },
-    throwError: left
+exports.bindTo = function (name) {
+    return exports.map(function_1.bindTo_(name));
 };
-var _a = pipeable_1.pipeable(exports.either), alt = _a.alt, ap = _a.ap, apFirst = _a.apFirst, apSecond = _a.apSecond, bimap = _a.bimap, chain = _a.chain, chainFirst = _a.chainFirst, duplicate = _a.duplicate, extend = _a.extend, flatten = _a.flatten, foldMap = _a.foldMap, map = _a.map, mapLeft = _a.mapLeft, reduce = _a.reduce, reduceRight = _a.reduceRight, fromOption = _a.fromOption, fromPredicate = _a.fromPredicate, filterOrElse = _a.filterOrElse;
-exports.alt = alt;
-exports.ap = ap;
-exports.apFirst = apFirst;
-exports.apSecond = apSecond;
-exports.bimap = bimap;
-exports.chain = chain;
-exports.chainFirst = chainFirst;
-exports.duplicate = duplicate;
-exports.extend = extend;
-exports.flatten = flatten;
-exports.foldMap = foldMap;
-exports.map = map;
-exports.mapLeft = mapLeft;
-exports.reduce = reduce;
-exports.reduceRight = reduceRight;
-exports.fromOption = fromOption;
-exports.fromPredicate = fromPredicate;
-exports.filterOrElse = filterOrElse;
+/**
+ * @since 2.8.0
+ */
+exports.bindW = function (name, f) {
+    return exports.chainW(function (a) {
+        return function_1.pipe(f(a), exports.map(function (b) { return function_1.bind_(a, name, b); }));
+    });
+};
+/**
+ * @since 2.8.0
+ */
+exports.bind = exports.bindW;
+// -------------------------------------------------------------------------------------
+// pipeable sequence S
+// -------------------------------------------------------------------------------------
+/**
+ * @since 2.8.0
+ */
+exports.apSW = function (name, fb) {
+    return function_1.flow(exports.map(function (a) { return function (b) { return function_1.bind_(a, name, b); }; }), exports.apW(fb));
+};
+/**
+ * @since 2.8.0
+ */
+exports.apS = exports.apSW;
 
 
 /***/ }),
@@ -6698,13 +6949,13 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getIndex = exports.getTags = exports.emptyTags = exports.alias = exports.clean = exports.StrictType = exports.dictionary = exports.Integer = exports.refinement = exports.object = exports.ObjectType = exports.Dictionary = exports.any = exports.AnyType = exports.never = exports.NeverType = exports.getDefaultContext = exports.getValidationError = exports.void = exports.interface = exports.Array = exports.undefined = exports.null = exports.exact = exports.ExactType = exports.taggedUnion = exports.TaggedUnionType = exports.strict = exports.readonlyArray = exports.ReadonlyArrayType = exports.readonly = exports.ReadonlyType = exports.tuple = exports.TupleType = exports.intersection = exports.IntersectionType = exports.union = exports.UnionType = exports.record = exports.getDomainKeys = exports.DictionaryType = exports.partial = exports.PartialType = exports.type = exports.InterfaceType = exports.array = exports.ArrayType = exports.recursion = exports.RecursiveType = exports.keyof = exports.KeyofType = exports.literal = exports.LiteralType = exports.Int = exports.brand = exports.RefinementType = exports.Function = exports.FunctionType = exports.UnknownRecord = exports.AnyDictionaryType = exports.UnknownArray = exports.AnyArrayType = exports.boolean = exports.BooleanType = exports.bigint = exports.BigIntType = exports.number = exports.NumberType = exports.string = exports.StringType = exports.unknown = exports.UnknownType = exports.voidType = exports.VoidType = exports.UndefinedType = exports.nullType = exports.NullType = exports.success = exports.failure = exports.failures = exports.appendContext = exports.getContextEntry = exports.getFunctionName = exports.identity = exports.Type = void 0;
 /**
  * @since 1.0.0
  */
 var Either_1 = __webpack_require__(311);
-var map = Either_1.either.map;
-var chain = Either_1.either.chain;
 /**
+ * @category Model
  * @since 1.0.0
  */
 var Type = /** @class */ (function () {
@@ -6729,7 +6980,13 @@ var Type = /** @class */ (function () {
     Type.prototype.pipe = function (ab, name) {
         var _this = this;
         if (name === void 0) { name = "pipe(" + this.name + ", " + ab.name + ")"; }
-        return new Type(name, ab.is, function (i, c) { return chain(_this.validate(i, c), function (a) { return ab.validate(a, c); }); }, this.encode === exports.identity && ab.encode === exports.identity ? exports.identity : function (b) { return _this.encode(ab.encode(b)); });
+        return new Type(name, ab.is, function (i, c) {
+            var e = _this.validate(i, c);
+            if (Either_1.isLeft(e)) {
+                return e;
+            }
+            return ab.validate(e.right, c);
+        }, this.encode === exports.identity && ab.encode === exports.identity ? exports.identity : function (b) { return _this.encode(ab.encode(b)); });
     };
     /**
      * @since 1.0.0
@@ -6799,9 +7056,9 @@ var pushAll = function (xs, ys) {
         xs.push(ys[i]);
     }
 };
-//
-// basic types
-//
+// -------------------------------------------------------------------------------------
+// primitives
+// -------------------------------------------------------------------------------------
 /**
  * @since 1.0.0
  */
@@ -6819,6 +7076,7 @@ var NullType = /** @class */ (function (_super) {
 }(Type));
 exports.NullType = NullType;
 /**
+ * @category Primitives
  * @since 1.0.0
  */
 exports.nullType = new NullType();
@@ -6858,6 +7116,7 @@ var VoidType = /** @class */ (function (_super) {
 }(Type));
 exports.VoidType = VoidType;
 /**
+ * @category Primitives
  * @since 1.2.0
  */
 exports.voidType = new VoidType();
@@ -6879,6 +7138,7 @@ var UnknownType = /** @class */ (function (_super) {
 }(Type));
 exports.UnknownType = UnknownType;
 /**
+ * @category Primitives
  * @since 1.5.0
  */
 exports.unknown = new UnknownType();
@@ -6899,6 +7159,7 @@ var StringType = /** @class */ (function (_super) {
 }(Type));
 exports.StringType = StringType;
 /**
+ * @category Primitives
  * @since 1.0.0
  */
 exports.string = new StringType();
@@ -6919,6 +7180,7 @@ var NumberType = /** @class */ (function (_super) {
 }(Type));
 exports.NumberType = NumberType;
 /**
+ * @category Primitives
  * @since 1.0.0
  */
 exports.number = new NumberType();
@@ -6941,6 +7203,7 @@ var BigIntType = /** @class */ (function (_super) {
 }(Type));
 exports.BigIntType = BigIntType;
 /**
+ * @category Primitives
  * @since 2.1.0
  */
 exports.bigint = new BigIntType();
@@ -6961,6 +7224,7 @@ var BooleanType = /** @class */ (function (_super) {
 }(Type));
 exports.BooleanType = BooleanType;
 /**
+ * @category Primitives
  * @since 1.0.0
  */
 exports.boolean = new BooleanType();
@@ -6981,6 +7245,7 @@ var AnyArrayType = /** @class */ (function (_super) {
 }(Type));
 exports.AnyArrayType = AnyArrayType;
 /**
+ * @category Primitives
  * @since 1.7.1
  */
 exports.UnknownArray = new AnyArrayType();
@@ -7005,10 +7270,12 @@ var AnyDictionaryType = /** @class */ (function (_super) {
 }(Type));
 exports.AnyDictionaryType = AnyDictionaryType;
 /**
+ * @category Primitives
  * @since 1.7.1
  */
 exports.UnknownRecord = new AnyDictionaryType();
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -7028,6 +7295,7 @@ var FunctionType = /** @class */ (function (_super) {
 }(Type));
 exports.FunctionType = FunctionType;
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -7051,7 +7319,11 @@ var RefinementType = /** @class */ (function (_super) {
     return RefinementType;
 }(Type));
 exports.RefinementType = RefinementType;
+// -------------------------------------------------------------------------------------
+// combinators
+// -------------------------------------------------------------------------------------
 /**
+ * @category Combinators
  * @since 1.8.1
  */
 exports.brand = function (codec, predicate, name) {
@@ -7060,6 +7332,8 @@ exports.brand = function (codec, predicate, name) {
 };
 /**
  * A branded codec representing an integer
+ *
+ * @category Primitives
  * @since 1.8.1
  */
 exports.Int = exports.brand(exports.number, function (n) { return Number.isInteger(n); }, 'Int');
@@ -7081,6 +7355,7 @@ var LiteralType = /** @class */ (function (_super) {
 }(Type));
 exports.LiteralType = LiteralType;
 /**
+ * @category Combinators
  * @since 1.0.0
  */
 exports.literal = function (value, name) {
@@ -7107,6 +7382,7 @@ var KeyofType = /** @class */ (function (_super) {
 exports.KeyofType = KeyofType;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 /**
+ * @category Combinators
  * @since 1.0.0
  */
 exports.keyof = function (keys, name) {
@@ -7141,6 +7417,7 @@ Object.defineProperty(RecursiveType.prototype, 'type', {
     configurable: true
 });
 /**
+ * @category Combinators
  * @since 1.0.0
  */
 exports.recursion = function (name, definition) {
@@ -7173,34 +7450,38 @@ var ArrayType = /** @class */ (function (_super) {
 }(Type));
 exports.ArrayType = ArrayType;
 /**
+ * @category Combinators
  * @since 1.0.0
  */
-exports.array = function (codec, name) {
-    if (name === void 0) { name = "Array<" + codec.name + ">"; }
-    return new ArrayType(name, function (u) { return exports.UnknownArray.is(u) && u.every(codec.is); }, function (u, c) {
-        return chain(exports.UnknownArray.validate(u, c), function (us) {
-            var len = us.length;
-            var as = us;
-            var errors = [];
-            for (var i = 0; i < len; i++) {
-                var ui = us[i];
-                var result = codec.validate(ui, exports.appendContext(c, String(i), codec, ui));
-                if (Either_1.isLeft(result)) {
-                    pushAll(errors, result.left);
-                }
-                else {
-                    var ai = result.right;
-                    if (ai !== ui) {
-                        if (as === us) {
-                            as = us.slice();
-                        }
-                        as[i] = ai;
+exports.array = function (item, name) {
+    if (name === void 0) { name = "Array<" + item.name + ">"; }
+    return new ArrayType(name, function (u) { return exports.UnknownArray.is(u) && u.every(item.is); }, function (u, c) {
+        var e = exports.UnknownArray.validate(u, c);
+        if (Either_1.isLeft(e)) {
+            return e;
+        }
+        var us = e.right;
+        var len = us.length;
+        var as = us;
+        var errors = [];
+        for (var i = 0; i < len; i++) {
+            var ui = us[i];
+            var result = item.validate(ui, exports.appendContext(c, String(i), item, ui));
+            if (Either_1.isLeft(result)) {
+                pushAll(errors, result.left);
+            }
+            else {
+                var ai = result.right;
+                if (ai !== ui) {
+                    if (as === us) {
+                        as = us.slice();
                     }
+                    as[i] = ai;
                 }
             }
-            return errors.length > 0 ? exports.failures(errors) : exports.success(as);
-        });
-    }, codec.encode === exports.identity ? exports.identity : function (a) { return a.map(codec.encode); }, codec);
+        }
+        return errors.length > 0 ? exports.failures(errors) : exports.success(as);
+    }, item.encode === exports.identity ? exports.identity : function (a) { return a.map(item.encode); }, item);
 };
 /**
  * @since 1.0.0
@@ -7236,6 +7517,7 @@ var getInterfaceTypeName = function (props) {
     return "{ " + getNameFromProps(props) + " }";
 };
 /**
+ * @category Combinators
  * @since 1.0.0
  */
 exports.type = function (props, name) {
@@ -7256,30 +7538,33 @@ exports.type = function (props, name) {
         }
         return false;
     }, function (u, c) {
-        return chain(exports.UnknownRecord.validate(u, c), function (o) {
-            var a = o;
-            var errors = [];
-            for (var i = 0; i < len; i++) {
-                var k = keys[i];
-                var ak = a[k];
-                var type_1 = types[i];
-                var result = type_1.validate(ak, exports.appendContext(c, k, type_1, ak));
-                if (Either_1.isLeft(result)) {
-                    pushAll(errors, result.left);
-                }
-                else {
-                    var vak = result.right;
-                    if (vak !== ak || (vak === undefined && !hasOwnProperty.call(a, k))) {
-                        /* istanbul ignore next */
-                        if (a === o) {
-                            a = __assign({}, o);
-                        }
-                        a[k] = vak;
+        var e = exports.UnknownRecord.validate(u, c);
+        if (Either_1.isLeft(e)) {
+            return e;
+        }
+        var o = e.right;
+        var a = o;
+        var errors = [];
+        for (var i = 0; i < len; i++) {
+            var k = keys[i];
+            var ak = a[k];
+            var type_1 = types[i];
+            var result = type_1.validate(ak, exports.appendContext(c, k, type_1, ak));
+            if (Either_1.isLeft(result)) {
+                pushAll(errors, result.left);
+            }
+            else {
+                var vak = result.right;
+                if (vak !== ak || (vak === undefined && !hasOwnProperty.call(a, k))) {
+                    /* istanbul ignore next */
+                    if (a === o) {
+                        a = __assign({}, o);
                     }
+                    a[k] = vak;
                 }
             }
-            return errors.length > 0 ? exports.failures(errors) : exports.success(a);
-        });
+        }
+        return errors.length > 0 ? exports.failures(errors) : exports.success(a);
     }, useIdentity(types)
         ? exports.identity
         : function (a) {
@@ -7316,6 +7601,7 @@ var getPartialTypeName = function (inner) {
     return "Partial<" + inner + ">";
 };
 /**
+ * @category Combinators
  * @since 1.0.0
  */
 exports.partial = function (props, name) {
@@ -7336,32 +7622,35 @@ exports.partial = function (props, name) {
         }
         return false;
     }, function (u, c) {
-        return chain(exports.UnknownRecord.validate(u, c), function (o) {
-            var a = o;
-            var errors = [];
-            for (var i = 0; i < len; i++) {
-                var k = keys[i];
-                var ak = a[k];
-                var type_2 = props[k];
-                var result = type_2.validate(ak, exports.appendContext(c, k, type_2, ak));
-                if (Either_1.isLeft(result)) {
-                    if (ak !== undefined) {
-                        pushAll(errors, result.left);
-                    }
-                }
-                else {
-                    var vak = result.right;
-                    if (vak !== ak) {
-                        /* istanbul ignore next */
-                        if (a === o) {
-                            a = __assign({}, o);
-                        }
-                        a[k] = vak;
-                    }
+        var e = exports.UnknownRecord.validate(u, c);
+        if (Either_1.isLeft(e)) {
+            return e;
+        }
+        var o = e.right;
+        var a = o;
+        var errors = [];
+        for (var i = 0; i < len; i++) {
+            var k = keys[i];
+            var ak = a[k];
+            var type_2 = props[k];
+            var result = type_2.validate(ak, exports.appendContext(c, k, type_2, ak));
+            if (Either_1.isLeft(result)) {
+                if (ak !== undefined) {
+                    pushAll(errors, result.left);
                 }
             }
-            return errors.length > 0 ? exports.failures(errors) : exports.success(a);
-        });
+            else {
+                var vak = result.right;
+                if (vak !== ak) {
+                    /* istanbul ignore next */
+                    if (a === o) {
+                        a = __assign({}, o);
+                    }
+                    a[k] = vak;
+                }
+            }
+        }
+        return errors.length > 0 ? exports.failures(errors) : exports.success(a);
     }, useIdentity(types)
         ? exports.identity
         : function (a) {
@@ -7398,25 +7687,28 @@ function enumerableRecord(keys, domain, codomain, name) {
     if (name === void 0) { name = "{ [K in " + domain.name + "]: " + codomain.name + " }"; }
     var len = keys.length;
     return new DictionaryType(name, function (u) { return exports.UnknownRecord.is(u) && keys.every(function (k) { return codomain.is(u[k]); }); }, function (u, c) {
-        return chain(exports.UnknownRecord.validate(u, c), function (o) {
-            var a = {};
-            var errors = [];
-            var changed = false;
-            for (var i = 0; i < len; i++) {
-                var k = keys[i];
-                var ok = o[k];
-                var codomainResult = codomain.validate(ok, exports.appendContext(c, k, codomain, ok));
-                if (Either_1.isLeft(codomainResult)) {
-                    pushAll(errors, codomainResult.left);
-                }
-                else {
-                    var vok = codomainResult.right;
-                    changed = changed || vok !== ok;
-                    a[k] = vok;
-                }
+        var e = exports.UnknownRecord.validate(u, c);
+        if (Either_1.isLeft(e)) {
+            return e;
+        }
+        var o = e.right;
+        var a = {};
+        var errors = [];
+        var changed = false;
+        for (var i = 0; i < len; i++) {
+            var k = keys[i];
+            var ok = o[k];
+            var codomainResult = codomain.validate(ok, exports.appendContext(c, k, codomain, ok));
+            if (Either_1.isLeft(codomainResult)) {
+                pushAll(errors, codomainResult.left);
             }
-            return errors.length > 0 ? exports.failures(errors) : exports.success((changed || Object.keys(o).length !== len ? a : o));
-        });
+            else {
+                var vok = codomainResult.right;
+                changed = changed || vok !== ok;
+                a[k] = vok;
+            }
+        }
+        return errors.length > 0 ? exports.failures(errors) : exports.success((changed || Object.keys(o).length !== len ? a : o));
     }, codomain.encode === exports.identity
         ? exports.identity
         : function (a) {
@@ -7505,6 +7797,7 @@ function nonEnumerableRecord(domain, codomain, name) {
         }, domain, codomain);
 }
 /**
+ * @category Combinators
  * @since 1.7.1
  */
 function record(domain, codomain, name) {
@@ -7535,6 +7828,7 @@ var getUnionName = function (codecs) {
     return '(' + codecs.map(function (type) { return type.name; }).join(' | ') + ')';
 };
 /**
+ * @category Combinators
  * @since 1.0.0
  */
 exports.union = function (codecs, name) {
@@ -7559,14 +7853,17 @@ exports.union = function (codecs, name) {
             }
             return false;
         }, function (u, c) {
-            return chain(exports.UnknownRecord.validate(u, c), function (r) {
-                var i = find_1(r[tag_1]);
-                if (i === undefined) {
-                    return exports.failure(u, c);
-                }
-                var codec = codecs[i];
-                return codec.validate(r, exports.appendContext(c, String(i), codec, r));
-            });
+            var e = exports.UnknownRecord.validate(u, c);
+            if (Either_1.isLeft(e)) {
+                return e;
+            }
+            var r = e.right;
+            var i = find_1(r[tag_1]);
+            if (i === undefined) {
+                return exports.failure(u, c);
+            }
+            var codec = codecs[i];
+            return codec.validate(r, exports.appendContext(c, String(i), codec, r));
         }, useIdentity(codecs)
             ? exports.identity
             : function (a) {
@@ -7701,29 +7998,32 @@ function tuple(codecs, name) {
     if (name === void 0) { name = "[" + codecs.map(function (type) { return type.name; }).join(', ') + "]"; }
     var len = codecs.length;
     return new TupleType(name, function (u) { return exports.UnknownArray.is(u) && u.length === len && codecs.every(function (type, i) { return type.is(u[i]); }); }, function (u, c) {
-        return chain(exports.UnknownArray.validate(u, c), function (us) {
-            var as = us.length > len ? us.slice(0, len) : us; // strip additional components
-            var errors = [];
-            for (var i = 0; i < len; i++) {
-                var a = us[i];
-                var type_3 = codecs[i];
-                var result = type_3.validate(a, exports.appendContext(c, String(i), type_3, a));
-                if (Either_1.isLeft(result)) {
-                    pushAll(errors, result.left);
-                }
-                else {
-                    var va = result.right;
-                    if (va !== a) {
-                        /* istanbul ignore next */
-                        if (as === us) {
-                            as = us.slice();
-                        }
-                        as[i] = va;
+        var e = exports.UnknownArray.validate(u, c);
+        if (Either_1.isLeft(e)) {
+            return e;
+        }
+        var us = e.right;
+        var as = us.length > len ? us.slice(0, len) : us; // strip additional components
+        var errors = [];
+        for (var i = 0; i < len; i++) {
+            var a = us[i];
+            var type_3 = codecs[i];
+            var result = type_3.validate(a, exports.appendContext(c, String(i), type_3, a));
+            if (Either_1.isLeft(result)) {
+                pushAll(errors, result.left);
+            }
+            else {
+                var va = result.right;
+                if (va !== a) {
+                    /* istanbul ignore next */
+                    if (as === us) {
+                        as = us.slice();
                     }
+                    as[i] = va;
                 }
             }
-            return errors.length > 0 ? exports.failures(errors) : exports.success(as);
-        });
+        }
+        return errors.length > 0 ? exports.failures(errors) : exports.success(as);
     }, useIdentity(codecs) ? exports.identity : function (a) { return codecs.map(function (type, i) { return type.encode(a[i]); }); }, codecs);
 }
 exports.tuple = tuple;
@@ -7745,18 +8045,12 @@ var ReadonlyType = /** @class */ (function (_super) {
 }(Type));
 exports.ReadonlyType = ReadonlyType;
 /**
+ * @category Combinators
  * @since 1.0.0
  */
 exports.readonly = function (codec, name) {
     if (name === void 0) { name = "Readonly<" + codec.name + ">"; }
-    return new ReadonlyType(name, codec.is, function (u, c) {
-        return map(codec.validate(u, c), function (x) {
-            if (process.env.NODE_ENV !== 'production') {
-                return Object.freeze(x);
-            }
-            return x;
-        });
-    }, codec.encode === exports.identity ? exports.identity : codec.encode, codec);
+    return new ReadonlyType(name, codec.is, codec.validate, codec.encode, codec);
 };
 /**
  * @since 1.0.0
@@ -7776,28 +8070,25 @@ var ReadonlyArrayType = /** @class */ (function (_super) {
 }(Type));
 exports.ReadonlyArrayType = ReadonlyArrayType;
 /**
+ * @category Combinators
  * @since 1.0.0
  */
-exports.readonlyArray = function (codec, name) {
-    if (name === void 0) { name = "ReadonlyArray<" + codec.name + ">"; }
-    var arrayType = exports.array(codec);
-    return new ReadonlyArrayType(name, arrayType.is, function (u, c) {
-        return map(arrayType.validate(u, c), function (x) {
-            if (process.env.NODE_ENV !== 'production') {
-                return Object.freeze(x);
-            }
-            return x;
-        });
-    }, arrayType.encode, codec);
+exports.readonlyArray = function (item, name) {
+    if (name === void 0) { name = "ReadonlyArray<" + item.name + ">"; }
+    var codec = exports.array(item);
+    return new ReadonlyArrayType(name, codec.is, codec.validate, codec.encode, item);
 };
 /**
  * Strips additional properties
+ *
+ * @category Combinators
  * @since 1.0.0
  */
 exports.strict = function (props, name) {
     return exports.exact(exports.type(props), name);
 };
 /**
+ * @category deprecated
  * @since 1.3.0
  * @deprecated
  */
@@ -7821,6 +8112,7 @@ exports.TaggedUnionType = TaggedUnionType;
 /**
  * Use `union` instead
  *
+ * @category deprecated
  * @since 1.3.0
  * @deprecated
  */
@@ -7900,9 +8192,20 @@ var getExactTypeName = function (codec) {
 exports.exact = function (codec, name) {
     if (name === void 0) { name = getExactTypeName(codec); }
     var props = getProps(codec);
-    return new ExactType(name, codec.is, function (u, c) { return chain(exports.UnknownRecord.validate(u, c), function () { return map(codec.validate(u, c), function (a) { return stripKeys(a, props); }); }); }, function (a) { return codec.encode(stripKeys(a, props)); }, codec);
+    return new ExactType(name, codec.is, function (u, c) {
+        var e = exports.UnknownRecord.validate(u, c);
+        if (Either_1.isLeft(e)) {
+            return e;
+        }
+        var ce = codec.validate(u, c);
+        if (Either_1.isLeft(ce)) {
+            return ce;
+        }
+        return Either_1.right(stripKeys(ce.right, props));
+    }, function (a) { return codec.encode(stripKeys(a, props)); }, codec);
 };
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -7911,6 +8214,7 @@ exports.getValidationError /* istanbul ignore next */ = function (value, context
     context: context
 }); };
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -7918,6 +8222,7 @@ exports.getDefaultContext /* istanbul ignore next */ = function (decoder) { retu
     { key: '', type: decoder }
 ]; };
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -7939,12 +8244,14 @@ var NeverType = /** @class */ (function (_super) {
 }(Type));
 exports.NeverType = NeverType;
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
 // tslint:disable-next-line: deprecation
 exports.never = new NeverType();
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -7963,6 +8270,8 @@ var AnyType = /** @class */ (function (_super) {
 exports.AnyType = AnyType;
 /**
  * Use `unknown` instead
+ *
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -7970,11 +8279,14 @@ exports.AnyType = AnyType;
 exports.any = new AnyType();
 /**
  * Use `UnknownRecord` instead
+ *
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
 exports.Dictionary = exports.UnknownRecord;
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -7993,6 +8305,8 @@ var ObjectType = /** @class */ (function (_super) {
 exports.ObjectType = ObjectType;
 /**
  * Use `UnknownRecord` instead
+ *
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -8000,16 +8314,27 @@ exports.ObjectType = ObjectType;
 exports.object = new ObjectType();
 /**
  * Use `brand` instead
+ *
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
 function refinement(codec, predicate, name) {
     if (name === void 0) { name = "(" + codec.name + " | " + exports.getFunctionName(predicate) + ")"; }
-    return new RefinementType(name, function (u) { return codec.is(u) && predicate(u); }, function (i, c) { return chain(codec.validate(i, c), function (a) { return (predicate(a) ? exports.success(a) : exports.failure(a, c)); }); }, codec.encode, codec, predicate);
+    return new RefinementType(name, function (u) { return codec.is(u) && predicate(u); }, function (i, c) {
+        var e = codec.validate(i, c);
+        if (Either_1.isLeft(e)) {
+            return e;
+        }
+        var a = e.right;
+        return predicate(a) ? exports.success(a) : exports.failure(a, c);
+    }, codec.encode, codec, predicate);
 }
 exports.refinement = refinement;
 /**
  * Use `Int` instead
+ *
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -8017,11 +8342,14 @@ exports.refinement = refinement;
 exports.Integer = refinement(exports.number, Number.isInteger, 'Integer');
 /**
  * Use `record` instead
+ *
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
 exports.dictionary = record;
 /**
+ * @category deprecated
  * @since 1.0.0
  * @deprecated
  */
@@ -8047,6 +8375,8 @@ var StrictType = /** @class */ (function (_super) {
 exports.StrictType = StrictType;
 /**
  * Drops the codec "kind"
+ *
+ * @category deprecated
  * @since 1.1.0
  * @deprecated
  */
@@ -9214,6 +9544,7 @@ module.exports = readShebang;
 
 // (from: https://github.com/actions/github-script/blob/80a5e943b446817466ff17e8b61cb80848641ed6/src/async-function.ts)
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.callAsyncFunction = void 0;
 const AsyncFunction = Object.getPrototypeOf(async () => { }).constructor;
 async function callAsyncFunction(args, source
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -9397,14 +9728,28 @@ class Command {
         return cmdStr;
     }
 }
+/**
+ * Sanitizes an input into a string so it can be passed into issueCommand safely
+ * @param input input to sanitize into a string
+ */
+function toCommandValue(input) {
+    if (input === null || input === undefined) {
+        return '';
+    }
+    else if (typeof input === 'string' || input instanceof String) {
+        return input;
+    }
+    return JSON.stringify(input);
+}
+exports.toCommandValue = toCommandValue;
 function escapeData(s) {
-    return (s || '')
+    return toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A');
 }
 function escapeProperty(s) {
-    return (s || '')
+    return toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
@@ -11413,11 +11758,13 @@ var ExitCode;
 /**
  * Sets env variable for this action and future actions in the job
  * @param name the name of the variable to set
- * @param val the value of the variable
+ * @param val the value of the variable. Non-string values will be converted to a string via JSON.stringify
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function exportVariable(name, val) {
-    process.env[name] = val;
-    command_1.issueCommand('set-env', { name }, val);
+    const convertedVal = command_1.toCommandValue(val);
+    process.env[name] = convertedVal;
+    command_1.issueCommand('set-env', { name }, convertedVal);
 }
 exports.exportVariable = exportVariable;
 /**
@@ -11456,12 +11803,22 @@ exports.getInput = getInput;
  * Sets the value of an output.
  *
  * @param     name     name of the output to set
- * @param     value    value to store
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setOutput(name, value) {
     command_1.issueCommand('set-output', { name }, value);
 }
 exports.setOutput = setOutput;
+/**
+ * Enables or disables the echoing of commands into stdout for the rest of the step.
+ * Echoing is disabled by default if ACTIONS_STEP_DEBUG is not set.
+ *
+ */
+function setCommandEcho(enabled) {
+    command_1.issue('echo', enabled ? 'on' : 'off');
+}
+exports.setCommandEcho = setCommandEcho;
 //-----------------------------------------------------------------------
 // Results
 //-----------------------------------------------------------------------
@@ -11495,18 +11852,18 @@ function debug(message) {
 exports.debug = debug;
 /**
  * Adds an error issue
- * @param message error issue message
+ * @param message error issue message. Errors will be converted to string via toString()
  */
 function error(message) {
-    command_1.issue('error', message);
+    command_1.issue('error', message instanceof Error ? message.toString() : message);
 }
 exports.error = error;
 /**
  * Adds an warning issue
- * @param message warning issue message
+ * @param message warning issue message. Errors will be converted to string via toString()
  */
 function warning(message) {
-    command_1.issue('warning', message);
+    command_1.issue('warning', message instanceof Error ? message.toString() : message);
 }
 exports.warning = warning;
 /**
@@ -11564,8 +11921,9 @@ exports.group = group;
  * Saves state for current action, the state can only be retrieved by this action's post job execution.
  *
  * @param     name     name of the state to store
- * @param     value    value to store
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function saveState(name, value) {
     command_1.issueCommand('save-state', { name }, value);
 }

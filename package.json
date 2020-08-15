@@ -25,29 +25,30 @@
   "author": "Ryo Ota <nwtgck@nwtgck.org> (https://github.com/nwtgck)",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.3",
+    "@actions/core": "^1.2.4",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^2.1.1",
-    "fp-ts": "^2.5.4",
-    "io-ts": "^2.2.1",
+    "fp-ts": "^2.8.1",
+    "io-ts": "^2.2.9",
+    "lodash": "^4.17.20",
     "marked": "^0.8.2",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^25.2.3",
     "@types/marked": "^0.7.4",
-    "@types/node": "^12.12.37",
+    "@types/node": "^12.12.54",
     "@types/node-fetch": "^2.5.7",
-    "@typescript-eslint/parser": "^2.30.0",
-    "@zeit/ncc": "^0.22.1",
+    "@typescript-eslint/parser": "^2.34.0",
+    "@zeit/ncc": "^0.22.3",
     "eslint": "^5.16.0",
     "eslint-plugin-github": "^2.0.0",
-    "eslint-plugin-jest": "^23.8.2",
-    "jest": "^25.5.2",
-    "jest-circus": "^25.5.2",
-    "js-yaml": "^3.13.1",
+    "eslint-plugin-jest": "^23.20.0",
+    "jest": "^25.5.4",
+    "jest-circus": "^25.5.4",
+    "js-yaml": "^3.14.0",
     "prettier": "^2.0.5",
-    "ts-jest": "^25.4.0",
-    "typescript": "^3.8.3"
+    "ts-jest": "^25.5.1",
+    "typescript": "^3.9.7"
   }
 }
