@@ -256,7 +256,7 @@ Run the command below.
 socat TCP-LISTEN:${clientHostPort} 'EXEC:curl -NsS https\\://ppng.io/${bPath}!!EXEC:curl -NsST - https\\://ppng.io/${aPath}'
 \`\`\`
 
-Run the comment below in another terminal.
+Run the command below in another terminal.
 
 \`\`\`bash
 ssh -p ${clientHostPort} runner@localhost
