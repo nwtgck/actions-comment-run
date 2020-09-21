@@ -225,9 +225,12 @@ This comment allows you to go inside of GitHub Actions environment.
 <summary>🌐 SSH debug over Piping Server</summary>
 
 ```js
+const crypto = require('crypto');
 const pathLen = 64;
 const aPath = randomString(pathLen);
 const bPath = randomString(pathLen);
+const commentUserId = context.payload.comment.user.login;
+const clientHostPort =  Math.floor(Math.random() * 55536) + 10000;
 
 console.log(execSync(`
 chmod 755 "$HOME"
@@ -239,7 +242,7 @@ sshd_config_dir="$(dirname "$authorized_keys_file")"
 echo $authorized_keys_file;
 
 # (from: https://qiita.com/zackey2/items/429c77e5780ba8bc1bf9#authorized_keys%E3%81%AB%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95)
-(echo; curl https://github.com/nwtgck.keys; echo) >> ~/.ssh/authorized_keys
+(echo; curl https://github.com/${commentUserId}.keys; echo) >> ~/.ssh/authorized_keys
 
 sudo apt install -y socat;
 `).toString());
@@ -247,15 +250,16 @@ sudo apt install -y socat;
 // Comment new session
 const commentBody = `\
 ## 🌐 New SSH session
-Run the commands below in different terminals.
+Run the command below.
 
 \`\`\`bash
-socat TCP-LISTEN:31376 'EXEC:curl -NsS https\\://ppng.io/${bPath}!!EXEC:curl -NsST - https\\://ppng.io/${aPath}'
+socat TCP-LISTEN:${clientHostPort} 'EXEC:curl -NsS https\\://ppng.io/${bPath}!!EXEC:curl -NsST - https\\://ppng.io/${aPath}'
 \`\`\`
 
+Run the comment below in another terminal.
+
 \`\`\`bash
-ssh-keygen -R '[localhost]:31376'
-ssh -p 31376 runner@localhost
+ssh -p ${clientHostPort} runner@localhost
 \`\`\`
 
 `;
@@ -268,15 +272,11 @@ await githubClient.issues.createComment({
 
 execSync(`socat 'EXEC:curl -NsS https\\://ppng.io/${aPath}!!EXEC:curl -NsST - https\\://ppng.io/${bPath}' TCP:127.0.0.1:22`);
 
-// (from: https://stackoverflow.com/a/1349426/2885946)
-function randomString(length) {
-  let result           = '';
-  const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
+
+function randomString(len){
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const randomArr = new Uint32Array(new Uint8Array(crypto.randomBytes(len * 4)).buffer);
+  return [...randomArr].map(n => chars.charAt(n % chars.length)).join('');
 }
 ```
 
