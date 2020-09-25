@@ -3155,7 +3155,7 @@ function untupled(f) {
     };
 }
 exports.untupled = untupled;
-function pipe(a, ab, bc, cd, de, ef, fg, gh, hi, ij) {
+function pipe(a, ab, bc, cd, de, ef, fg, gh, hi, ij, jk, kl, lm, mn, no, op, pq, qr, rs, st) {
     switch (arguments.length) {
         case 1:
             return a;
@@ -3177,6 +3177,26 @@ function pipe(a, ab, bc, cd, de, ef, fg, gh, hi, ij) {
             return hi(gh(fg(ef(de(cd(bc(ab(a))))))));
         case 10:
             return ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))));
+        case 11:
+            return jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a))))))))));
+        case 12:
+            return kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))))));
+        case 13:
+            return lm(kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a))))))))))));
+        case 14:
+            return mn(lm(kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))))))));
+        case 15:
+            return no(mn(lm(kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a))))))))))))));
+        case 16:
+            return op(no(mn(lm(kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))))))))));
+        case 17:
+            return pq(op(no(mn(lm(kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a))))))))))))))));
+        case 18:
+            return qr(pq(op(no(mn(lm(kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))))))))))));
+        case 19:
+            return rs(qr(pq(op(no(mn(lm(kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a))))))))))))))))));
+        case 20:
+            return st(rs(qr(pq(op(no(mn(lm(kl(jk(ij(hi(gh(fg(ef(de(cd(bc(ab(a)))))))))))))))))));
     }
     return;
 }
@@ -5981,7 +6001,7 @@ exports.paginateRest = paginateRest;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.apS = exports.apSW = exports.bind = exports.bindW = exports.bindTo = exports.exists = exports.elem = exports.toError = exports.either = exports.getValidationMonoid = exports.MonadThrow = exports.ChainRec = exports.Extend = exports.Alt = exports.Bifunctor = exports.Traversable = exports.Foldable = exports.Monad = exports.Applicative = exports.Functor = exports.getValidationSemigroup = exports.getValidation = exports.getAltValidation = exports.getApplicativeValidation = exports.getWitherable = exports.getFilterable = exports.getApplyMonoid = exports.getApplySemigroup = exports.getSemigroup = exports.getEq = exports.getShow = exports.URI = exports.throwError = exports.sequence = exports.traverse = exports.reduceRight = exports.foldMap = exports.reduce = exports.extend = exports.duplicate = exports.alt = exports.flatten = exports.chainFirst = exports.chainFirstW = exports.chain = exports.chainW = exports.of = exports.apSecond = exports.apFirst = exports.ap = exports.apW = exports.mapLeft = exports.bimap = exports.map = exports.filterOrElse = exports.orElse = exports.swap = exports.getOrElse = exports.getOrElseW = exports.fold = exports.fromPredicate = exports.fromOption = exports.stringifyJSON = exports.parseJSON = exports.tryCatch = exports.fromNullable = exports.right = exports.left = exports.isRight = exports.isLeft = void 0;
+exports.apS = exports.apSW = exports.bind = exports.bindW = exports.bindTo = exports.exists = exports.elem = exports.toError = exports.either = exports.getValidationMonoid = exports.MonadThrow = exports.ChainRec = exports.Extend = exports.Alt = exports.Bifunctor = exports.Traversable = exports.Foldable = exports.Monad = exports.Applicative = exports.Functor = exports.getValidationSemigroup = exports.getValidation = exports.getAltValidation = exports.getApplicativeValidation = exports.getWitherable = exports.getFilterable = exports.getApplyMonoid = exports.getApplySemigroup = exports.getSemigroup = exports.getEq = exports.getShow = exports.URI = exports.throwError = exports.sequence = exports.traverse = exports.reduceRight = exports.foldMap = exports.reduce = exports.duplicate = exports.extend = exports.alt = exports.flatten = exports.chainFirst = exports.chainFirstW = exports.chain = exports.chainW = exports.of = exports.apSecond = exports.apFirst = exports.ap = exports.apW = exports.mapLeft = exports.bimap = exports.map = exports.filterOrElse = exports.orElse = exports.swap = exports.getOrElse = exports.getOrElseW = exports.fold = exports.fromPredicate = exports.fromOption = exports.stringifyJSON = exports.parseJSON = exports.tryCatch = exports.fromNullable = exports.right = exports.left = exports.isRight = exports.isLeft = void 0;
 var ChainRec_1 = __webpack_require__(99);
 var function_1 = __webpack_require__(231);
 // -------------------------------------------------------------------------------------
@@ -6207,29 +6227,35 @@ exports.orElse = orElse;
  * @category combinators
  * @since 2.0.0
  */
-exports.filterOrElse = function (predicate, onFalse) { return function (ma) {
-    return chain_(ma, function (a) { return (predicate(a) ? exports.right(a) : exports.left(onFalse(a))); });
-}; };
+exports.filterOrElse = function (predicate, onFalse) {
+    return exports.chain(function (a) { return (predicate(a) ? exports.right(a) : exports.left(onFalse(a))); });
+};
 // -------------------------------------------------------------------------------------
 // non-pipeables
 // -------------------------------------------------------------------------------------
-var map_ = function (ma, f) { return (exports.isLeft(ma) ? ma : exports.right(f(ma.right))); };
-var ap_ = function (mab, ma) {
-    return exports.isLeft(mab) ? mab : exports.isLeft(ma) ? ma : exports.right(mab.right(ma.right));
-};
-var chain_ = function (ma, f) {
-    return exports.isLeft(ma) ? ma : f(ma.right);
-};
-var reduce_ = function (fa, b, f) { return (exports.isLeft(fa) ? b : f(b, fa.right)); };
-var foldMap_ = function (M) { return function (fa, f) { return (exports.isLeft(fa) ? M.empty : f(fa.right)); }; };
-var reduceRight_ = function (fa, b, f) { return (exports.isLeft(fa) ? b : f(fa.right, b)); };
-var traverse_ = function (F) { return function (ma, f) {
-    return exports.isLeft(ma) ? F.of(exports.left(ma.left)) : F.map(f(ma.right), exports.right);
+var map_ = function (fa, f) { return function_1.pipe(fa, exports.map(f)); };
+var ap_ = function (fab, fa) { return function_1.pipe(fab, exports.ap(fa)); };
+/* istanbul ignore next */
+var chain_ = function (ma, f) { return function_1.pipe(ma, exports.chain(f)); };
+/* istanbul ignore next */
+var reduce_ = function (fa, b, f) { return function_1.pipe(fa, exports.reduce(b, f)); };
+/* istanbul ignore next */
+var foldMap_ = function (M) { return function (fa, f) {
+    var foldMapM = exports.foldMap(M);
+    return function_1.pipe(fa, foldMapM(f));
 }; };
-var bimap_ = function (fea, f, g) { return (exports.isLeft(fea) ? exports.left(f(fea.left)) : exports.right(g(fea.right))); };
-var mapLeft_ = function (fea, f) { return (exports.isLeft(fea) ? exports.left(f(fea.left)) : fea); };
-var alt_ = function (fa, that) { return (exports.isLeft(fa) ? that() : fa); };
-var extend_ = function (wa, f) { return (exports.isLeft(wa) ? wa : exports.right(f(wa))); };
+/* istanbul ignore next */
+var reduceRight_ = function (fa, b, f) { return function_1.pipe(fa, exports.reduceRight(b, f)); };
+var traverse_ = function (F) {
+    var traverseF = exports.traverse(F);
+    return function (ta, f) { return function_1.pipe(ta, traverseF(f)); };
+};
+var bimap_ = function (fa, f, g) { return function_1.pipe(fa, exports.bimap(f, g)); };
+var mapLeft_ = function (fa, f) { return function_1.pipe(fa, exports.mapLeft(f)); };
+/* istanbul ignore next */
+var alt_ = function (fa, that) { return function_1.pipe(fa, exports.alt(that)); };
+/* istanbul ignore next */
+var extend_ = function (wa, f) { return function_1.pipe(wa, exports.extend(f)); };
 var chainRec_ = function (a, f) {
     return ChainRec_1.tailRec(f(a), function (e) {
         return exports.isLeft(e) ? exports.right(exports.left(e.left)) : exports.isLeft(e.right) ? exports.left(f(e.right.left)) : exports.right(exports.right(e.right.right));
@@ -6245,21 +6271,25 @@ var chainRec_ = function (a, f) {
  * @category Functor
  * @since 2.0.0
  */
-exports.map = function (f) { return function (fa) { return map_(fa, f); }; };
+exports.map = function (f) { return function (fa) {
+    return exports.isLeft(fa) ? fa : exports.right(f(fa.right));
+}; };
 /**
  * Map a pair of functions over the two type arguments of the bifunctor.
  *
  * @category Bifunctor
  * @since 2.0.0
  */
-exports.bimap = function (f, g) { return function (fa) { return bimap_(fa, f, g); }; };
+exports.bimap = function (f, g) { return function (fa) { return (exports.isLeft(fa) ? exports.left(f(fa.left)) : exports.right(g(fa.right))); }; };
 /**
  * Map a function over the first type argument of a bifunctor.
  *
  * @category Bifunctor
  * @since 2.0.0
  */
-exports.mapLeft = function (f) { return function (fa) { return mapLeft_(fa, f); }; };
+exports.mapLeft = function (f) { return function (fa) {
+    return exports.isLeft(fa) ? exports.left(f(fa.left)) : fa;
+}; };
 /**
  * Less strict version of [`ap`](#ap).
  *
@@ -6267,7 +6297,7 @@ exports.mapLeft = function (f) { return function (fa) { return mapLeft_(fa, f); 
  * @since 2.8.0
  */
 exports.apW = function (fa) { return function (fab) {
-    return ap_(fab, fa);
+    return exports.isLeft(fab) ? fab : exports.isLeft(fa) ? fa : exports.right(fab.right(fa.right));
 }; };
 /**
  * Apply a function to an argument under a type constructor.
@@ -6282,18 +6312,18 @@ exports.ap = exports.apW;
  * @category Apply
  * @since 2.0.0
  */
-exports.apFirst = function (fb) { return function (fa) {
-    return ap_(map_(fa, function (a) { return function () { return a; }; }), fb);
-}; };
+exports.apFirst = function (fb) {
+    return function_1.flow(exports.map(function (a) { return function () { return a; }; }), exports.ap(fb));
+};
 /**
  * Combine two effectful actions, keeping only the result of the second.
  *
  * @category Apply
  * @since 2.0.0
  */
-exports.apSecond = function (fb) { return function (fa) {
-    return ap_(map_(fa, function () { return function (b) { return b; }; }), fb);
-}; };
+exports.apSecond = function (fb) {
+    return function_1.flow(exports.map(function () { return function (b) { return b; }; }), exports.ap(fb));
+};
 /**
  * @category Applicative
  * @since 2.7.0
@@ -6305,7 +6335,9 @@ exports.of = exports.right;
  * @category Monad
  * @since 2.6.0
  */
-exports.chainW = function (f) { return function (ma) { return chain_(ma, f); }; };
+exports.chainW = function (f) { return function (ma) {
+    return exports.isLeft(ma) ? ma : f(ma.right);
+}; };
 /**
  * Composes computations in sequence, using the return value of one computation to determine the next computation.
  *
@@ -6319,7 +6351,11 @@ exports.chain = exports.chainW;
  * @category Monad
  * @since 2.8.0
  */
-exports.chainFirstW = function (f) { return function (ma) { return chain_(ma, function (a) { return map_(f(a), function () { return a; }); }); }; };
+exports.chainFirstW = function (f) { return function (ma) {
+    return function_1.pipe(ma, exports.chainW(function (a) {
+        return function_1.pipe(f(a), exports.map(function () { return a; }));
+    }));
+}; };
 /**
  * Composes computations in sequence, using the return value of one computation to determine the next computation and
  * keeping only the result of the first.
@@ -6332,7 +6368,9 @@ exports.chainFirst = exports.chainFirstW;
  * @category Monad
  * @since 2.0.0
  */
-exports.flatten = function (mma) { return chain_(mma, function_1.identity); };
+exports.flatten = 
+/*#__PURE__*/
+exports.chain(function_1.identity);
 /**
  * Identifies an associative operation on a type constructor. It is similar to `Semigroup`, except that it applies to
  * types of kind `* -> *`.
@@ -6341,50 +6379,48 @@ exports.flatten = function (mma) { return chain_(mma, function_1.identity); };
  * @since 2.0.0
  */
 exports.alt = function (that) { return function (fa) {
-    return alt_(fa, that);
+    return exports.isLeft(fa) ? that() : fa;
 }; };
 /**
  * @category Extend
  * @since 2.0.0
  */
-exports.duplicate = function (wa) { return extend_(wa, function_1.identity); };
+exports.extend = function (f) { return function (wa) {
+    return exports.isLeft(wa) ? wa : exports.right(f(wa));
+}; };
 /**
  * @category Extend
  * @since 2.0.0
  */
-exports.extend = function (f) { return function (ma) {
-    return extend_(ma, f);
-}; };
+exports.duplicate = 
+/*#__PURE__*/
+exports.extend(function_1.identity);
 /**
  * @category Foldable
  * @since 2.0.0
  */
 exports.reduce = function (b, f) { return function (fa) {
-    return reduce_(fa, b, f);
+    return exports.isLeft(fa) ? b : f(b, fa.right);
 }; };
 /**
  * @category Foldable
  * @since 2.0.0
  */
-exports.foldMap = function (M) {
-    var foldMapM = foldMap_(M);
-    return function (f) { return function (fa) { return foldMapM(fa, f); }; };
-};
+exports.foldMap = function (M) { return function (f) { return function (fa) {
+    return exports.isLeft(fa) ? M.empty : f(fa.right);
+}; }; };
 /**
  * @category Foldable
  * @since 2.0.0
  */
 exports.reduceRight = function (b, f) { return function (fa) {
-    return reduceRight_(fa, b, f);
+    return exports.isLeft(fa) ? b : f(fa.right, b);
 }; };
 /**
  * @category Traversable
  * @since 2.6.3
  */
-exports.traverse = function (F) {
-    var traverseF = traverse_(F);
-    return function (f) { return function (fa) { return traverseF(fa, f); }; };
-};
+exports.traverse = function (F) { return function (f) { return function (ta) { return (exports.isLeft(ta) ? F.of(exports.left(ta.left)) : F.map(f(ta.right), exports.right)); }; }; };
 /**
  * @category Traversable
  * @since 2.6.3
