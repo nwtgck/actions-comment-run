@@ -32,7 +32,7 @@
     "io-ts": "^2.2.9",
     "lodash": "^4.17.20",
     "marked": "^0.8.2",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
