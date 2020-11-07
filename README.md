@@ -41,6 +41,7 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         allowed-associations: '["OWNER"]'
+        whitelisted-users: '[]'
 ```
 
 You can introduce comment-run with the following command.
@@ -53,7 +54,7 @@ After introducing this, create new issue or pull request and post `@github-actio
 
 Only accounts who have admin or write permission can execute the comment on your repository. (ref: [Collaborators | GitHub Developer Guide](https://developer.github.com/v3/repos/collaborators/#review-a-users-permission-level))
 
-By default, only owner can execute the scripts. You can change `allowed-associations: '["OWNER"]'` in the yaml above.
+By default, only the owner can execute the scripts. You can change `allowed-associations: '["OWNER"]'` in the yaml above, or add users who can run scripts regardless of their comment association via `whitelisted-users` (this is useful in org-owned repos, where only the organization itself has `OWNER` permission).
 
 Here are examples.
 - `allowed-associations: '["OWNER"]'`
