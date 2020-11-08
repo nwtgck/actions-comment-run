@@ -76,13 +76,15 @@ async function run(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const association = (context.payload as any).comment.author_association
     // If commenting user is not allowed to run scripts
-    let associationMatches: boolean = allowedAssociations.includes(association);
+    const associationMatches: boolean = allowedAssociations.includes(
+      association
+    )
 
     // Check if user is explicitly whitelisted
     const whitelistedUsersStr: string = core.getInput('whitelisted-users')
-    const whitelistedUsers: string[] = JSON.parse(whitelistedUsersStr);
-    const actor: string = context.actor;
-    let userMatches: boolean = whitelistedUsers.includes(actor);
+    const whitelistedUsers: string[] = JSON.parse(whitelistedUsersStr)
+    const actor: string = context.actor
+    const userMatches: boolean = whitelistedUsers.includes(actor)
 
     // Check that the user is either part of the allowed associations, or is a whitelisted user
     if (!associationMatches && !userMatches) {
