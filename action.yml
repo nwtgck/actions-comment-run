@@ -8,7 +8,7 @@ inputs:
   allowed-associations:
     description: Comment author associations allowed to execute scripts (e.g. '["OWNER", "COLLABORATOR"]')
     default: '["OWNER"]'
-  whitelisted-users:
+  allowed-users:
     description: Users who are allowed to execute scripts *regardless* of their comment author association, which is useful in org-owned repos where only the organization itself has the OWNER association
     default: '[]'
 runs:

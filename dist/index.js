@@ -2821,7 +2821,7 @@ async function run() {
         // If commenting user is not allowed to run scripts
         const associationMatches = allowedAssociations.includes(association);
         // Check if user is explicitly whitelisted
-        const whitelistedUsersStr = core.getInput('whitelisted-users');
+        const whitelistedUsersStr = core.getInput('allowed-users');
         const whitelistedUsers = JSON.parse(whitelistedUsersStr);
         const actor = github_1.context.actor;
         const userMatches = whitelistedUsers.includes(actor);

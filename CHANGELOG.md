@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 ### Changed
-* Added a `whitelisted-users` config key to give users permission to run scripts even if they don't have the correct CommentAuthorAssociation
+* Added an `allowed-users` config key to give users permission to run scripts even if they don't have the correct CommentAuthorAssociation
 
 ## [1.1.3] - 2020-04-07
 ### Changed

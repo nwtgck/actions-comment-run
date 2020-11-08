@@ -81,7 +81,7 @@ async function run(): Promise<void> {
     )
 
     // Check if user is explicitly whitelisted
-    const whitelistedUsersStr: string = core.getInput('whitelisted-users')
+    const whitelistedUsersStr: string = core.getInput('allowed-users')
     const whitelistedUsers: string[] = JSON.parse(whitelistedUsersStr)
     const actor: string = context.actor
     const userMatches: boolean = whitelistedUsers.includes(actor)
