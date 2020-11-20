@@ -29,7 +29,7 @@
     "@actions/exec": "^1.0.4",
     "@actions/github": "^2.1.1",
     "fp-ts": "^2.8.3",
-    "io-ts": "^2.2.10",
+    "io-ts": "^2.2.13",
     "lodash": "^4.17.20",
     "marked": "^0.8.2",
     "node-fetch": "^2.6.1"
