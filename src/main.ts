@@ -58,6 +58,7 @@ async function run(): Promise<void> {
       )
       return
     }
+
     // Get allowed associations
     const allowedAssociationsStr = core.getInput('allowed-associations')
     // Parse and validate
@@ -75,13 +76,25 @@ async function run(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const association = (context.payload as any).comment.author_association
     // If commenting user is not allowed to run scripts
-    if (!allowedAssociations.includes(association)) {
+    const associationMatches: boolean = allowedAssociations.includes(
+      association
+    )
+
+    // Check if user is explicitly whitelisted
+    const whitelistedUsersStr: string = core.getInput('allowed-users')
+    const whitelistedUsers: string[] = JSON.parse(whitelistedUsersStr)
+    const actor: string = context.actor
+    const userMatches: boolean = whitelistedUsers.includes(actor)
+
+    // Check that the user is either part of the allowed associations, or is a whitelisted user
+    if (!associationMatches && !userMatches) {
       // eslint-disable-next-line no-console
       console.warn(
-        `NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`
+        `NOTE: The allowed associations to run scripts are ${allowedAssociationsStr} with additional whitelisted users ${whitelistedUsersStr}, but your association is ${association} and your username is ${actor}; neither of these permit access.`
       )
       return
     }
+
     // Add :eyes: reaction
     const reactionRes = await githubClient.reactions
       .createForIssueComment({
