@@ -31,6 +31,8 @@ on:
 
 jobs:
   comment-run:
+    # Skip the job if the comment does not conatin the trigger phrase
+    if: contains(github.event.comment.body, '@github-actions run')
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
