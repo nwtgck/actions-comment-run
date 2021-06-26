@@ -130,6 +130,16 @@ async function run(): Promise<void> {
           // Execute script with shebang
           await executeShebangScript(token.text)
         }
+        // Read the comment buffer file, if present, and post its contents as comment
+        try {
+          const commentBuffer = core.getInput('comment-buffer')
+          const commentText = fs.readFileSync(commentBuffer, 'utf8')
+          if (commentText) {
+            postComment(commentText)
+          }
+        } catch (error) {
+          // Comment buffer file absent, do nothing
+        }
       }
     }
     if (reactionRes !== undefined) {

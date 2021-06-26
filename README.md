@@ -327,6 +327,18 @@ print(np.array([1, 2, 3]))
 ```
 ````
 
+Redirect `STDOUT` and/or `STDERR` to `comment.buffer` file or write any text to this file to post it as a comment at the end (location of this buffer file can be customized using `comment-buffer` input variable).
+
+````md
+@github-actions run
+
+```sh
+#! /bin/sh
+echo "Files in $PWD" > comment.buffer
+ls -l >> comment.buffer
+```
+````
+
 Here are examples.
 - Deno: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596170740>
 - Go: <https://github.com/nwtgck/actions-comment-run/pull/1#issuecomment-596176678>
