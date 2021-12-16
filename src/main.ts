@@ -26,13 +26,12 @@ async function run(): Promise<void> {
     }
     // Create GitHub client which can be used in the user script
     const githubClient = new GitHub(githubToken)
-    const permissionRes = await githubClient.repos.getCollaboratorPermissionLevel(
-      {
+    const permissionRes =
+      await githubClient.repos.getCollaboratorPermissionLevel({
         owner: context.repo.owner,
         repo: context.repo.repo,
         username: context.actor
-      }
-    )
+      })
     if (permissionRes.status !== 200) {
       // eslint-disable-next-line no-console
       console.error(
@@ -106,7 +105,7 @@ async function run(): Promise<void> {
       })
     }
     // Parse the comment
-    const tokens = marked.lexer(comment)
+    const tokens = marked.Lexer.lex(comment)
     for (const token of tokens) {
       if (token.type === 'code') {
         if (token.lang === 'js' || token.lang === 'javascript') {
