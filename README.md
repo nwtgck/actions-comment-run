@@ -118,7 +118,7 @@ postComment(`![LGTM](${picUrl.href})`);
 
 ### Update all npm packages
 
-Although Dependabot is useful, sometimes you might think bump all packages up. This comment allows you to do this.
+Although Dependabot is useful, sometimes you might want to bump all packages up. This comment allows you to do this.
 
 <img src="doc_assets/update-all-npm-packages.png" width="600">
 
