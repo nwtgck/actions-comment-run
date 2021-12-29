@@ -6,6 +6,8 @@ on:
 
 jobs:
   test: # make sure the action works on a clean machine without building
+    # Skip the job if the comment does not conatin the trigger phrase
+    if: contains(github.event.comment.body, '@github-actions run')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
