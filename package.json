@@ -35,7 +35,7 @@
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.24",
+    "@types/jest": "^27.4.0",
     "@types/marked": "^4.0.1",
     "@types/node": "^12.12.62",
     "@types/node-fetch": "^2.5.10",
