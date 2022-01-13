@@ -31,7 +31,7 @@
     "fp-ts": "^2.11.5",
     "io-ts": "^2.2.10",
     "lodash": "^4.17.21",
-    "marked": "^4.0.7",
+    "marked": "^4.0.10",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
