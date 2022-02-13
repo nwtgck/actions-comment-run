@@ -40,7 +40,7 @@
     "@types/node": "^12.12.62",
     "@types/node-fetch": "^2.5.10",
     "@typescript-eslint/parser": "^4.33.0",
-    "@vercel/ncc": "^0.33.0",
+    "@vercel/ncc": "^0.33.3",
     "eslint": "^5.16.0",
     "eslint-plugin-github": "^2.0.0",
     "eslint-plugin-jest": "^24.7.0",
