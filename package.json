@@ -28,7 +28,7 @@
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^2.1.1",
-    "fp-ts": "^2.11.5",
+    "fp-ts": "^2.13.1",
     "io-ts": "^2.2.10",
     "lodash": "^4.17.21",
     "marked": "^4.0.7",
