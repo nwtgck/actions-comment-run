@@ -31,12 +31,12 @@
     "fp-ts": "^2.11.5",
     "io-ts": "^2.2.10",
     "lodash": "^4.17.21",
-    "marked": "^4.0.7",
+    "marked": "^4.2.1",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.24",
-    "@types/marked": "^4.0.1",
+    "@types/marked": "^4.0.7",
     "@types/node": "^12.12.62",
     "@types/node-fetch": "^2.5.10",
     "@typescript-eslint/parser": "^4.33.0",
