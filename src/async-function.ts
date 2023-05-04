@@ -2,7 +2,6 @@
 
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/prefer-interface
 type AsyncFunctionArguments = {[key: string]: any}
 
 export async function callAsyncFunction(

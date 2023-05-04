@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
 import * as exec from '@actions/exec'
@@ -20,7 +18,6 @@ async function run(): Promise<void> {
   try {
     const githubToken = core.getInput('github-token', {required: true})
     if (context.eventName !== 'issue_comment') {
-      // eslint-disable-next-line no-console
       console.warn(`event name is not 'issue_comment': ${context.eventName}`)
       return
     }
@@ -33,7 +30,6 @@ async function run(): Promise<void> {
         username: context.actor
       })
     if (permissionRes.status !== 200) {
-      // eslint-disable-next-line no-console
       console.error(
         `Permission check returns non-200 status: ${permissionRes.status}`
       )
@@ -41,17 +37,14 @@ async function run(): Promise<void> {
     }
     const actorPermission = permissionRes.data.permission
     if (!['admin', 'write'].includes(actorPermission)) {
-      // eslint-disable-next-line no-console
       console.error(
         `ERROR: ${context.actor} does not have admin/write permission: ${actorPermission}`
       )
       return
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const comment: string = (context.payload as any).comment.body
     // If not command-run-request comment
     if (!comment.startsWith(commentPrefix)) {
-      // eslint-disable-next-line no-console
       console.log(
         `HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`
       )
@@ -64,18 +57,15 @@ async function run(): Promise<void> {
       JSON.parse(allowedAssociationsStr)
     )
     if (!isRight(allowedAssociationsEither)) {
-      // eslint-disable-next-line no-console
       console.error(
         `ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`
       )
       return
     }
     const allowedAssociations: string[] = allowedAssociationsEither.right
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const association = (context.payload as any).comment.author_association
     // If commenting user is not allowed to run scripts
     if (!allowedAssociations.includes(association)) {
-      // eslint-disable-next-line no-console
       console.warn(
         `NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`
       )
@@ -84,20 +74,17 @@ async function run(): Promise<void> {
     // Add :eyes: reaction
     const reactionRes = await githubClient.reactions
       .createForIssueComment({
-        // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
         comment_id: (context.payload as any).comment.id,
         content: 'eyes',
         owner: context.repo.owner,
         repo: context.repo.repo
       })
       .catch(err => {
-        // eslint-disable-next-line no-console
         console.error('Add-eyes-reaction failed')
       })
     // Post GitHub issue comment
     const postComment = async (body: string): Promise<void> => {
       await githubClient.issues.createComment({
-        // eslint-disable-next-line @typescript-eslint/camelcase
         issue_number: context.issue.number,
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -135,28 +122,24 @@ async function run(): Promise<void> {
       // Add +1 reaction
       await githubClient.reactions
         .createForIssueComment({
-          // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
           comment_id: (context.payload as any).comment.id,
           content: '+1',
           owner: context.repo.owner,
           repo: context.repo.repo
         })
         .catch(err => {
-          // eslint-disable-next-line no-console
           console.error('Add-+1-reaction failed')
         })
       // Delete eyes reaction
       await githubClient.reactions
         .delete({
-          // eslint-disable-next-line @typescript-eslint/camelcase
           reaction_id: reactionRes.data.id
         })
         .catch(err => {
-          // eslint-disable-next-line no-console
           console.error('Delete-reaction failed')
         })
     }
-  } catch (error) {
+  } catch (error: any) {
     core.setFailed(error.message)
   }
 }
@@ -164,7 +147,6 @@ async function run(): Promise<void> {
 function createTmpFileName(): string {
   const prefix = 'tmp_'
   const len = 32
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const fileName = `${prefix}${randomString(len)}`
     if (!fs.existsSync(fileName)) return fileName
