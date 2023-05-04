@@ -136,7 +136,7 @@ async function run(): Promise<void> {
           reaction_id: reactionRes.data.id
         })
         .catch(err => {
-          console.error('Delete-reaction failed')
+          console.error('Delete-reaction failed', err)
         })
     }
   } catch (error: any) {
