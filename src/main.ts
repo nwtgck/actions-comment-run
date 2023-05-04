@@ -4,13 +4,12 @@ import * as exec from '@actions/exec'
 import fetch from 'node-fetch'
 import {execSync} from 'child_process'
 import * as marked from 'marked'
-import * as t from 'io-ts'
-import {isRight} from 'fp-ts/lib/Either'
+import {z} from 'zod'
 import * as fs from 'fs'
 
 import {callAsyncFunction} from './async-function'
 
-const commentAuthorAssociationsType = t.array(t.string)
+const commentAuthorAssociationsSchema = z.array(z.string())
 
 const commentPrefix = '@github-actions run'
 
@@ -53,16 +52,16 @@ async function run(): Promise<void> {
     // Get allowed associations
     const allowedAssociationsStr = core.getInput('allowed-associations')
     // Parse and validate
-    const allowedAssociationsEither = commentAuthorAssociationsType.decode(
+    const allowedAssociationsResult = commentAuthorAssociationsSchema.safeParse(
       JSON.parse(allowedAssociationsStr)
     )
-    if (!isRight(allowedAssociationsEither)) {
+    if (!allowedAssociationsResult.success) {
       console.error(
         `ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`
       )
       return
     }
-    const allowedAssociations: string[] = allowedAssociationsEither.right
+    const allowedAssociations: string[] = allowedAssociationsResult.data
     const association = (context.payload as any).comment.author_association
     // If commenting user is not allowed to run scripts
     if (!allowedAssociations.includes(association)) {
