@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
-    "@actions/github": "^2.1.1",
+    "@actions/github": "^5.1.1",
     "lodash": "^4.17.21",
     "marked": "^4.3.0",
     "node-fetch": "^3.3.1",
