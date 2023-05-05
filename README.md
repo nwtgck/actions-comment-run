@@ -33,10 +33,7 @@ jobs:
   comment-run:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-      with:
-        # 0 indicates all history
-        fetch-depth: 0
+    - uses: actions/checkout@v3
     - uses: nwtgck/actions-comment-run@v1.1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
