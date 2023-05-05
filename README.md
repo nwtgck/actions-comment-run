@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
-    - uses: nwtgck/actions-comment-run@v1.1
+    - uses: nwtgck/actions-comment-run@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         allowed-associations: '["OWNER"]'
