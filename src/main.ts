@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {context, GitHub} from '@actions/github'
+import * as github from '@actions/github'
 import * as exec from '@actions/exec'
 import fetch from 'node-fetch'
 import {execSync} from 'child_process'
@@ -14,6 +14,7 @@ const commentAuthorAssociationsSchema = z.array(z.string())
 const commentPrefix = '@github-actions run'
 
 async function run(): Promise<void> {
+  const context = github.context
   try {
     const githubToken = core.getInput('github-token', {required: true})
     if (context.eventName !== 'issue_comment') {
@@ -21,9 +22,9 @@ async function run(): Promise<void> {
       return
     }
     // Create GitHub client which can be used in the user script
-    const githubClient = new GitHub(githubToken)
+    const octokit = github.getOctokit(githubToken)
     const permissionRes =
-      await githubClient.repos.getCollaboratorPermissionLevel({
+      await octokit.rest.repos.getCollaboratorPermissionLevel({
         owner: context.repo.owner,
         repo: context.repo.repo,
         username: context.actor
@@ -71,7 +72,7 @@ async function run(): Promise<void> {
       return
     }
     // Add :eyes: reaction
-    const reactionRes = await githubClient.reactions
+    const reactionRes = await octokit.rest.reactions
       .createForIssueComment({
         comment_id: (context.payload as any).comment.id,
         content: 'eyes',
@@ -83,13 +84,24 @@ async function run(): Promise<void> {
       })
     // Post GitHub issue comment
     const postComment = async (body: string): Promise<void> => {
-      await githubClient.issues.createComment({
+      await octokit.rest.issues.createComment({
         issue_number: context.issue.number,
         owner: context.repo.owner,
         repo: context.repo.repo,
         body
       })
     }
+    // for @actions/github@2 compat
+    const githubClient = new Proxy(octokit, {
+      get(target, prop, receiver) {
+        if (prop === 'graphql') {
+          core.warning(`Use octokit.graphql instead of githubClient.graphql`)
+          return octokit.graphql
+        }
+        core.warning(`Use octokit.rest.${String(prop)} instead of githubClient.${String(prop)}`)
+        return Reflect.get(octokit.rest, prop, receiver)
+      }
+    })
     // Parse the comment
     const tokens = marked.Lexer.lex(comment)
     for (const token of tokens) {
@@ -103,9 +115,9 @@ async function run(): Promise<void> {
               exec,
               fetch,
               context,
-              GitHub,
               githubToken,
-              githubClient,
+              octokit,
+              githubClient, // deprecated (users should use octokit)
               execSync,
               postComment
             },
@@ -119,7 +131,7 @@ async function run(): Promise<void> {
     }
     if (reactionRes !== undefined) {
       // Add +1 reaction
-      await githubClient.reactions
+      await octokit.rest.reactions
         .createForIssueComment({
           comment_id: (context.payload as any).comment.id,
           content: '+1',
@@ -130,9 +142,12 @@ async function run(): Promise<void> {
           console.error('Add-+1-reaction failed')
         })
       // Delete eyes reaction
-      await githubClient.reactions
-        .delete({
-          reaction_id: reactionRes.data.id
+      await octokit.rest.reactions
+        .deleteForIssueComment({
+          comment_id: (context.payload as any).comment.id,
+          reaction_id: reactionRes.data.id,
+          owner: context.repo.owner,
+          repo: context.repo.repo
         })
         .catch(err => {
           console.error('Delete-reaction failed', err)
