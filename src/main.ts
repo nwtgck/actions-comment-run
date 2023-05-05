@@ -1,40 +1,35 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import * as core from '@actions/core'
-import {context, GitHub} from '@actions/github'
+import * as github from '@actions/github'
 import * as exec from '@actions/exec'
 import fetch from 'node-fetch'
 import {execSync} from 'child_process'
 import * as marked from 'marked'
-import * as t from 'io-ts'
-import {isRight} from 'fp-ts/lib/Either'
+import {z} from 'zod'
 import * as fs from 'fs'
 
 import {callAsyncFunction} from './async-function'
 
-const commentAuthorAssociationsType = t.array(t.string)
+const commentAuthorAssociationsSchema = z.array(z.string())
 
 const commentPrefix = '@github-actions run'
 
 async function run(): Promise<void> {
+  const context = github.context
   try {
     const githubToken = core.getInput('github-token', {required: true})
     if (context.eventName !== 'issue_comment') {
-      // eslint-disable-next-line no-console
       console.warn(`event name is not 'issue_comment': ${context.eventName}`)
       return
     }
     // Create GitHub client which can be used in the user script
-    const githubClient = new GitHub(githubToken)
-    const permissionRes = await githubClient.repos.getCollaboratorPermissionLevel(
-      {
+    const octokit = github.getOctokit(githubToken)
+    const permissionRes =
+      await octokit.rest.repos.getCollaboratorPermissionLevel({
         owner: context.repo.owner,
         repo: context.repo.repo,
         username: context.actor
-      }
-    )
+      })
     if (permissionRes.status !== 200) {
-      // eslint-disable-next-line no-console
       console.error(
         `Permission check returns non-200 status: ${permissionRes.status}`
       )
@@ -42,17 +37,14 @@ async function run(): Promise<void> {
     }
     const actorPermission = permissionRes.data.permission
     if (!['admin', 'write'].includes(actorPermission)) {
-      // eslint-disable-next-line no-console
       console.error(
         `ERROR: ${context.actor} does not have admin/write permission: ${actorPermission}`
       )
       return
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const comment: string = (context.payload as any).comment.body
     // If not command-run-request comment
     if (!comment.startsWith(commentPrefix)) {
-      // eslint-disable-next-line no-console
       console.log(
         `HINT: Comment-run is triggered when your comment start with "${commentPrefix}"`
       )
@@ -61,52 +53,57 @@ async function run(): Promise<void> {
     // Get allowed associations
     const allowedAssociationsStr = core.getInput('allowed-associations')
     // Parse and validate
-    const allowedAssociationsEither = commentAuthorAssociationsType.decode(
+    const allowedAssociationsResult = commentAuthorAssociationsSchema.safeParse(
       JSON.parse(allowedAssociationsStr)
     )
-    if (!isRight(allowedAssociationsEither)) {
-      // eslint-disable-next-line no-console
+    if (!allowedAssociationsResult.success) {
       console.error(
         `ERROR: Invalid allowed-associations: ${allowedAssociationsStr}`
       )
       return
     }
-    const allowedAssociations: string[] = allowedAssociationsEither.right
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allowedAssociations: string[] = allowedAssociationsResult.data
     const association = (context.payload as any).comment.author_association
     // If commenting user is not allowed to run scripts
     if (!allowedAssociations.includes(association)) {
-      // eslint-disable-next-line no-console
       console.warn(
         `NOTE: The allowed associations to run scripts are ${allowedAssociationsStr}, but you are ${association}.`
       )
       return
     }
     // Add :eyes: reaction
-    const reactionRes = await githubClient.reactions
+    const reactionRes = await octokit.rest.reactions
       .createForIssueComment({
-        // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
         comment_id: (context.payload as any).comment.id,
         content: 'eyes',
         owner: context.repo.owner,
         repo: context.repo.repo
       })
       .catch(err => {
-        // eslint-disable-next-line no-console
         console.error('Add-eyes-reaction failed')
       })
     // Post GitHub issue comment
     const postComment = async (body: string): Promise<void> => {
-      await githubClient.issues.createComment({
-        // eslint-disable-next-line @typescript-eslint/camelcase
+      await octokit.rest.issues.createComment({
         issue_number: context.issue.number,
         owner: context.repo.owner,
         repo: context.repo.repo,
         body
       })
     }
+    // for @actions/github@2 compat
+    const githubClient = new Proxy(octokit, {
+      get(target, prop, receiver) {
+        if (prop === 'graphql') {
+          core.warning(`Use octokit.graphql instead of githubClient.graphql`)
+          return octokit.graphql
+        }
+        core.warning(`Use octokit.rest.${String(prop)} instead of githubClient.${String(prop)}`)
+        return Reflect.get(octokit.rest, prop, receiver)
+      }
+    })
     // Parse the comment
-    const tokens = marked.lexer(comment)
+    const tokens = marked.Lexer.lex(comment)
     for (const token of tokens) {
       if (token.type === 'code') {
         if (token.lang === 'js' || token.lang === 'javascript') {
@@ -118,9 +115,9 @@ async function run(): Promise<void> {
               exec,
               fetch,
               context,
-              GitHub,
               githubToken,
-              githubClient,
+              octokit,
+              githubClient, // deprecated (users should use octokit)
               execSync,
               postComment
             },
@@ -134,30 +131,29 @@ async function run(): Promise<void> {
     }
     if (reactionRes !== undefined) {
       // Add +1 reaction
-      await githubClient.reactions
+      await octokit.rest.reactions
         .createForIssueComment({
-          // eslint-disable-next-line @typescript-eslint/camelcase, @typescript-eslint/no-explicit-any
           comment_id: (context.payload as any).comment.id,
           content: '+1',
           owner: context.repo.owner,
           repo: context.repo.repo
         })
         .catch(err => {
-          // eslint-disable-next-line no-console
           console.error('Add-+1-reaction failed')
         })
       // Delete eyes reaction
-      await githubClient.reactions
-        .delete({
-          // eslint-disable-next-line @typescript-eslint/camelcase
-          reaction_id: reactionRes.data.id
+      await octokit.rest.reactions
+        .deleteForIssueComment({
+          comment_id: (context.payload as any).comment.id,
+          reaction_id: reactionRes.data.id,
+          owner: context.repo.owner,
+          repo: context.repo.repo
         })
         .catch(err => {
-          // eslint-disable-next-line no-console
-          console.error('Delete-reaction failed')
+          console.error('Delete-reaction failed', err)
         })
     }
-  } catch (error) {
+  } catch (error: any) {
     core.setFailed(error.message)
   }
 }
@@ -165,7 +161,6 @@ async function run(): Promise<void> {
 function createTmpFileName(): string {
   const prefix = 'tmp_'
   const len = 32
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const fileName = `${prefix}${randomString(len)}`
     if (!fs.existsSync(fileName)) return fileName
