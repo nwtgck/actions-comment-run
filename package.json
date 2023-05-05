@@ -29,7 +29,7 @@
     "@actions/exec": "^1.0.4",
     "@actions/github": "^5.1.1",
     "lodash": "^4.17.21",
-    "marked": "^4.3.0",
+    "marked": "^5.0.0",
     "node-fetch": "^3.3.1",
     "zod": "^3.21.4"
   },
