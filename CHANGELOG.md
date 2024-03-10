@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [3.0.0] - 2024-03-10
+### Changed
+* Updates the default runtime to node20
+* Use @actions/core 1.10.1
+* Use @actions/github 6.0.0
+* Use node-fetch 3.3.2
+* Update dependencies
+
 ## [2.0.0] - 2023-05-05
 ### Changed
 * Updates the default runtime to node16
@@ -52,7 +60,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 ### Added
 * Execute comment
 
-[Unreleased]: https://github.com/nwtgck/actions-comment-run/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/nwtgck/actions-comment-run/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/nwtgck/actions-comment-run/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/nwtgck/actions-comment-run/compare/v1.1.3...v2.0.0
 [1.1.3]: https://github.com/nwtgck/actions-comment-run/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/nwtgck/actions-comment-run/compare/v1.1.1...v1.1.2

@@ -31,10 +31,10 @@ on:
 
 jobs:
   comment-run:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
-    - uses: nwtgck/actions-comment-run@v1.1
+    - uses: actions/checkout@v4
+    - uses: nwtgck/actions-comment-run@v3
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         allowed-associations: '["OWNER"]'
