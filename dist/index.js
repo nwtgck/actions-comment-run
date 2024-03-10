@@ -154,7 +154,7 @@ async function run() {
                         context,
                         githubToken,
                         octokit,
-                        githubClient,
+                        githubClient, // deprecated (users should use octokit)
                         execSync: // deprecated (users should use octokit)
                         child_process_1.execSync,
                         postComment
